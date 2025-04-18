@@ -8,6 +8,36 @@ import (
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
+func DrawCrosshair() {
+  // this is straight from claude, not going to lie
+    // Get screen center
+    screenWidth := GetScreenWidth()
+    screenHeight := GetScreenHeight()
+    centerX := screenWidth / 2
+    centerY := screenHeight / 2
+    
+    // Crosshair settings
+    crosshairSize := 10
+    crosshairThickness := 2
+    crosshairColor := Black
+    
+    // Draw horizontal line
+    DrawLineEx(
+        Vector2{X: float32(centerX - crosshairSize), Y: float32(centerY)},
+        Vector2{X: float32(centerX + crosshairSize), Y: float32(centerY)},
+        float32(crosshairThickness),
+        crosshairColor,
+    )
+    
+    // Draw vertical line
+    DrawLineEx(
+        Vector2{X: float32(centerX), Y: float32(centerY - crosshairSize)},
+        Vector2{X: float32(centerX), Y: float32(centerY + crosshairSize)},
+        float32(crosshairThickness),
+        crosshairColor,
+    )
+}
+
 func drawBlock(b types.Block){
   // find center point of block
   centerPoint := b.CenterPoint()

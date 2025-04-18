@@ -99,6 +99,8 @@ func main() {
     // PrintPlayerPosition(player)
     EndMode3D()
 
+    DrawCrosshair()
+
 		EndDrawing()
 	}
 }
