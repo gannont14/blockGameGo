@@ -19,15 +19,17 @@ func drawBlock(b types.Block){
       constants.BlockHeight,
       constants.BlockDepth,
       b.BlockColor())
+    // Draw the bounding box to debug
+    // DrawBoundingBox(b.BoundBox, Blue)
   }
 
-  // if b.Focused{
-    // DrawCubeWires(centerPoint,
-    //   constants.BlockWidth,
-    //   constants.BlockHeight,
-    //   constants.BlockDepth,
-    //   Black)
-  // }
+  if b.Focused{
+    DrawCubeWires(centerPoint,
+      constants.BlockWidth,
+      constants.BlockHeight,
+      constants.BlockDepth,
+      Black)
+  }
 }
 
 func drawChunk(c types.Chunk){
@@ -51,9 +53,10 @@ func drawChunk(c types.Chunk){
   // fmt.Println("Drew Chunks: ", count)
 }
 
-func DrawChunks(w types.World, p types.Player) {
+func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
 
-  idcs := types.GetRenderableChunkIndeces(p, w)
+  // moved out to main function
+  // idcs := types.GetRenderableChunkIndeces(p, w)
 
   if len(idcs) == 0{
     return
@@ -61,7 +64,7 @@ func DrawChunks(w types.World, p types.Player) {
 
   // new and improved
   for _, val := range idcs{
-    j, i := types.UnboxChunkIndex(val)
+    j, i := val.UnboxChunkIndex()
     c := w.Chunks[i][j]
     drawChunk(c)
   }

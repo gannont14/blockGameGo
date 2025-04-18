@@ -5,4 +5,5 @@ const (
   PlayerMoveSpeed = 0.2
   PlayerMouseSensitivity = 0.1
   PlayerHeight = 3
+  PlayerHighlightRange = 7.0
 )

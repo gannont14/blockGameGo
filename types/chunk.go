@@ -12,9 +12,7 @@ type Chunk struct{
 }
 
 /*
-
   Generates the indeces within the world struct that should be rendered
-
 */
 type ChunkIndex struct{
   Row int
@@ -30,8 +28,20 @@ func NewChunkIndex(row int, col int) ChunkIndex{
   return c
 }
 
-func UnboxChunkIndex(c ChunkIndex) (int, int) {
+func (c *ChunkIndex)UnboxChunkIndex() (int, int) {
   return c.Row, c.Col
+}
+
+func GetChunksFromIndeces(idcs []ChunkIndex, w *World) []*Chunk{
+
+  c := make([]*Chunk, 0)
+
+  for _, val := range idcs{
+    j, i := val.UnboxChunkIndex()
+    c = append(c, &w.Chunks[i][j])
+  }
+
+  return c
 }
 
 func GenerateTestChunk(orig Vector3) Chunk{
@@ -43,11 +53,12 @@ func GenerateTestChunk(orig Vector3) Chunk{
   for y := range constants.ChunkSizeY{
     for x := range constants.ChunkSizeX{
       for z := range constants.ChunkSizeZ{
-        b := Block{
-          Type: Air,
-          WorldPos: Vector3Add(ch.Origin, blockOffset(x, y, z)),
-          ChunkId: 0,
-        }
+
+        b := NewBlock(
+          Air, 
+          Vector3Add(ch.Origin, blockOffset(x, y, z)),
+          0,
+          )
 
         // hard code to be the floor
         if y == 0{

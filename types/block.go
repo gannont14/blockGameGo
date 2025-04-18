@@ -2,6 +2,8 @@ package types
 
 import (
 	"blockProject/constants"
+	"fmt"
+
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -25,8 +27,15 @@ type Block struct{
 func NewBlock(t BlockType, pos Vector3, chunkId int) Block{
   // generate bounding box min and max based on position vector
   bbMin := pos
-  bbMax := Vector3Add(bbMin, NewVector3(constants.BlockWidth, constants.BlockHeight, constants.BlockDepth))
+  bbMax := Vector3Add(bbMin, 
+    NewVector3(constants.BlockWidth, 
+      constants.BlockHeight, 
+      constants.BlockDepth))
 
+  fmt.Printf("Box from [%f, %f, %f] to [%f, %f, %f]\n",
+    bbMin.X, bbMin.Y, bbMin.Z, 
+    bbMax.X, bbMax.Y, bbMax.Z, 
+    )
   // generate actual block struct
   b := Block{
     Type: t,

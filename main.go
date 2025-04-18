@@ -12,6 +12,8 @@ import (
 var camera Camera3D
 var player types.Player
 var world types.World
+var renderedChunkIndeces []types.ChunkIndex
+var renderedChunks []*types.Chunk
 
 func initGame(){
   // init the camera
@@ -29,12 +31,14 @@ func initGame(){
   // generate the worlds test chunk
   world.Chunks = types.GenerateTestChunks(constants.NumChunksX, constants.NumChunksY)
   fmt.Println("Chunks generated")
+
+
 }
 
 // all draw functions
 func drawGame(){
   // draw the chunks
-  DrawChunks(world, player)
+  DrawChunks(world, player, renderedChunkIndeces)
 
   //...
 }
@@ -43,6 +47,13 @@ func updateGame(){
   // upate the players positions
   pos := NewVector3(camera.Position.X, camera.Position.Y - (constants.PlayerHeight/2), camera.Position.Z)
   player.Pos = pos
+
+  // figure out which chunks to render
+  renderedChunkIndeces = types.GetRenderableChunkIndeces(player, world)
+  renderedChunks = types.GetChunksFromIndeces(renderedChunkIndeces, &world)
+
+  // find the active block that the player is looking at
+  player.GenerateActiveBlock(renderedChunks)
 
   //...
 }
@@ -85,7 +96,7 @@ func main() {
     BeginMode3D(camera)
 
     drawGame()
-    PrintPlayerPosition(player)
+    // PrintPlayerPosition(player)
     EndMode3D()
 
 		EndDrawing()
