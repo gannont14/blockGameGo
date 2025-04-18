@@ -11,6 +11,29 @@ type Chunk struct{
   Origin Vector3
 }
 
+/*
+
+  Generates the indeces within the world struct that should be rendered
+
+*/
+type ChunkIndex struct{
+  Row int
+  Col int
+}
+
+func NewChunkIndex(row int, col int) ChunkIndex{
+  c := ChunkIndex{
+    Row: row,
+    Col: col,
+  }
+
+  return c
+}
+
+func UnboxChunkIndex(c ChunkIndex) (int, int) {
+  return c.Row, c.Col
+}
+
 func GenerateTestChunk(orig Vector3) Chunk{
   // count := 0
   var ch Chunk
@@ -84,6 +107,60 @@ func ChunkTotalDepth() float32 {
 
 func ChunkTotalHeight() float32 {
   return float32(constants.ChunkSizeY * constants.BlockHeight)
+}
+
+/*
+  Returns a list of ChunkIndexes that should be drawn by the game,
+  The function is massive so could probably be shortened
+*/
+
+func GetRenderableChunkIndeces(p Player, w World) []ChunkIndex{
+  // Find the plyaers coords and what indeces they should be int he world 
+  x := int(p.Pos.X / ChunkTotalWidth())
+  z := int(p.Pos.Z / ChunkTotalDepth())
+
+  chunkIndeces := make([]ChunkIndex, 0)
+
+  // find teh numChunksX and numChunksY of world
+
+  numChunksX := len(w.Chunks)
+  if(numChunksX == 0){ // SHOULD never happen, Should...
+    return chunkIndeces
+  }
+
+  numChunksY := len(w.Chunks[0])
+  if(numChunksY == 0){ //...
+    return chunkIndeces
+  }
+
+  // get the negative and positive render distances
+  for i := (x - constants.RenderDistance); i <= (x + constants.RenderDistance); i++{
+    for j := (z - constants.RenderDistance); j <= (z + constants.RenderDistance); j++{
+      // potential chunk index
+      potentialChunkInd := NewChunkIndex(i, j)
+
+      // Check bounds within the world array, i.e. not < 0 or > numChunksX
+      if(potentialChunkInd .validChunkIndex(numChunksX, numChunksY)){
+        // add to the list of valid chunk indeces
+        chunkIndeces = append(chunkIndeces, potentialChunkInd)
+      }
+    }
+  }
+
+  return chunkIndeces
+}
+
+func (c *ChunkIndex) validChunkIndex(numChunksX int, numChunksY int) bool{
+  // valid on the X coordinate
+  if(c.Col < 0 || c.Col > numChunksX-1){
+    return false
+  }
+  // valid on the Y coordinate
+  if(c.Row < 0 || c.Row > numChunksY-1){
+    return false
+  }
+
+  return true
 }
 
 func (c *Chunk) CenterPoint() Vector3 {

@@ -52,18 +52,30 @@ func drawChunk(c types.Chunk){
 }
 
 func DrawChunks(w types.World, p types.Player) {
-  if len(w.Chunks) == 0{
+
+  idcs := types.GetRenderableChunkIndeces(p, w)
+
+  if len(idcs) == 0{
     return
   }
 
-  for i := range len(w.Chunks){
-    for j := range len(w.Chunks[0]){
-      c := w.Chunks[i][j]
-      if(c.ShouldBeRendered(p)){
-        drawChunk(c)
-      }
-    }
+  // new and improved
+  for _, val := range idcs{
+    j, i := types.UnboxChunkIndex(val)
+    c := w.Chunks[i][j]
+    drawChunk(c)
   }
+
+
+  // deprecated
+  // for i := range len(w.Chunks){
+  //   for j := range len(w.Chunks[0]){
+  //     c := w.Chunks[i][j]
+  //     if(c.ShouldBeRendered(p)){
+  //       drawChunk(c)
+  //     }
+  //   }
+  // }
 }
 
 
