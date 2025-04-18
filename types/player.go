@@ -2,7 +2,7 @@ package types
 
 import (
 	"blockProject/constants"
-	"fmt"
+	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
 )
@@ -22,7 +22,7 @@ func NewPlayer(startPos Vector3, c *Camera) Player{
   return p
 }
 
-func (p *Player) GenerateActiveBlock(activeChunks []*Chunk) {
+func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block) {
 
   // create ray of player in direciton
   playerLookRay := NewRay(
@@ -48,6 +48,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk) {
   var closeI, closeJ, closeK int
   var blockChunk *Chunk
   blockHit := false
+  *focusedBlock = nil
   // loop through the active chunks to find
   for _, c := range activeChunks{
     // loop through blocks in said chunk 
@@ -66,7 +67,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk) {
           if coll.Hit{
             if coll.Distance < closestDistance && coll.Distance < constants.PlayerHighlightRange{
               // c.Blocks[i][j][k].Focused = true
-              fmt.Printf("Colliding with type: %d\n", c.Blocks[i][j][k].Type)
+              // fmt.Printf("Colliding with type: %d\n", c.Blocks[i][j][k].Type)
               closestDistance = coll.Distance
               closeI, closeJ, closeK = i, j, k
               blockHit = true
@@ -81,6 +82,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk) {
   // NOW we check and highlight the block
   if blockHit {
     blockChunk.Blocks[closeI][closeJ][closeK].Focused = true
+    *focusedBlock = &blockChunk.Blocks[closeI][closeJ][closeK]
   }
 }
 

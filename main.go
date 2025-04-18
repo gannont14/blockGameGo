@@ -14,6 +14,9 @@ var player types.Player
 var world types.World
 var renderedChunkIndeces []types.ChunkIndex
 var renderedChunks []*types.Chunk
+var focusedBlock *types.Block
+
+var shouldDrawCrosshair bool
 
 func initGame(){
   // init the camera
@@ -32,7 +35,10 @@ func initGame(){
   world.Chunks = types.GenerateTestChunks(constants.NumChunksX, constants.NumChunksY)
   fmt.Println("Chunks generated")
 
+  focusedBlock = nil
 
+  // debug stuff
+  shouldDrawCrosshair = true
 }
 
 // all draw functions
@@ -41,6 +47,20 @@ func drawGame(){
   DrawChunks(world, player, renderedChunkIndeces)
 
   //...
+}
+
+func drawHud(){
+  if shouldDrawCrosshair{
+    DrawCrosshair()
+  }
+  if constants.DEBUG {
+    // render coords
+    DrawDebugPlayerPos(player)
+    // render focused block
+    DrawDebugActiveBlock(focusedBlock)
+    // render FPS
+    DrawDebugPlayerFPS()
+  }
 }
 
 func updateGame(){
@@ -53,7 +73,7 @@ func updateGame(){
   renderedChunks = types.GetChunksFromIndeces(renderedChunkIndeces, &world)
 
   // find the active block that the player is looking at
-  player.GenerateActiveBlock(renderedChunks)
+  player.GenerateActiveBlock(renderedChunks, &focusedBlock)
 
   //...
 }
@@ -66,7 +86,6 @@ func main() {
   DisableCursor()
 
   initGame()
-
 
 	for !WindowShouldClose() {
 
@@ -99,7 +118,7 @@ func main() {
     // PrintPlayerPosition(player)
     EndMode3D()
 
-    DrawCrosshair()
+    drawHud()
 
 		EndDrawing()
 	}
