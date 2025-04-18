@@ -14,11 +14,12 @@ var player types.Player
 var world types.World
 var renderedChunkIndeces []types.ChunkIndex
 var renderedChunks []*types.Chunk
-var focusedBlock *types.Block
 
-var shouldDrawCrosshair bool
+var focusedBlock *types.Block = nil
+var inventoryDisplayed bool = false
 
 func initGame(){
+
   // init the camera
 	camera.Position = NewVector3(0.0, constants.PlayerHeight, 4.0) // Camera position
 	camera.Target = NewVector3(0.0, 2.0, 0.0)   // Camera looking at point
@@ -34,11 +35,6 @@ func initGame(){
   // generate the worlds test chunk
   world.Chunks = types.GenerateTestChunks(constants.NumChunksX, constants.NumChunksY)
   fmt.Println("Chunks generated")
-
-  focusedBlock = nil
-
-  // debug stuff
-  shouldDrawCrosshair = true
 }
 
 // all draw functions
@@ -50,9 +46,10 @@ func drawGame(){
 }
 
 func drawHud(){
-  if shouldDrawCrosshair{
-    DrawCrosshair()
-  }
+  // draw crosshair
+  DrawCrosshair()
+
+  // debug menu
   if constants.DEBUG {
     // render coords
     DrawDebugPlayerPos(player)
@@ -65,7 +62,9 @@ func drawHud(){
 
 func updateGame(){
   // upate the players positions
-  pos := NewVector3(camera.Position.X, camera.Position.Y - (constants.PlayerHeight/2), camera.Position.Z)
+  pos := NewVector3(camera.Position.X, // Player's position is just the camera's position except for different y
+    camera.Position.Y - (constants.PlayerHeight / 2),
+    camera.Position.Z)
   player.Pos = pos
 
   // figure out which chunks to render

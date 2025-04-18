@@ -2,7 +2,7 @@ package constants
 
 
 const (
-  BlockWidth = 1  //X
-  BlockDepth = 1  //Y
-  BlockHeight = 1 //Z
+  BlockWidth  = 2  //X
+  BlockDepth  = 2  //Y
+  BlockHeight = 2 //Z
 )
