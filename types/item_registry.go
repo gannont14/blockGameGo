@@ -1,11 +1,14 @@
 package types
 
-import "fmt"
+import (
+	// "blockProject/items"
+	"fmt"
+)
 
-/* 
-    Wanted to add a simple way to register items, and look them up efficiently,
-    this can be expanded upon by introducing other ways to look up an item, 
-    such as by name
+/*
+   Wanted to add a simple way to register items, and look them up efficiently,
+   this can be expanded upon by introducing other ways to look up an item,
+   such as by name
 */
 
 type ItemRegistry struct{

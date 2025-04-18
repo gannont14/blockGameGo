@@ -3,7 +3,6 @@ package types
 import (
 	"blockProject/constants"
 	// "fmt"
-
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -11,13 +10,19 @@ type Player struct{
   Id int;
   Pos Vector3;
   Cam *Camera;
+  Inventory *Inventory
+  CanMoveCamera bool
 }
 
 func NewPlayer(startPos Vector3, c *Camera) Player{
+  // find the number of slots the player should have
+  numInvSlots := constants.PlayerInventoryCols * constants.PlayerInventoryRows
   p := Player{
     Id: 0,
     Pos: startPos,
     Cam: c,
+    Inventory: NewInventory(numInvSlots, "PlayerInventory"),
+    CanMoveCamera: true,
   }
   return p
 }
@@ -93,4 +98,37 @@ func (p *Player) scaledPlayerLookDirection() Vector3{
   normViewDir := Vector3Normalize(viewDirection)
 
   return normViewDir
+}
+
+func (p *Player) UpdatePlayerCamera(cam *Camera){
+
+  camVec := Vector3{
+    X: GetMouseDelta().X*constants.PlayerMouseSensitivity,
+    Y: GetMouseDelta().Y*constants.PlayerMouseSensitivity,
+    Z: 0.0,
+  }
+
+  if p.CanMoveCamera == false {
+    camVec = Vector3Scale(camVec, 0.0)
+  }
+
+  UpdateCameraPro(cam,                     // Absolute mess
+    Vector3{
+      X: BoolToFloat(IsKeyDown(KeyW) || IsKeyDown(KeyUp))*constants.PlayerMoveSpeed -
+      BoolToFloat(IsKeyDown(KeyS) || IsKeyDown(KeyDown))*constants.PlayerMoveSpeed,
+      Y: BoolToFloat(IsKeyDown(KeyD) || IsKeyDown(KeyRight))*constants.PlayerMoveSpeed -
+      BoolToFloat(IsKeyDown(KeyA) || IsKeyDown(KeyLeft))*constants.PlayerMoveSpeed,
+      Z: BoolToFloat(IsKeyDown(KeySpace)) * constants.PlayerMoveSpeed -
+      BoolToFloat(IsKeyDown(KeyC) || IsKeyDown(KeyLeftControl)) * constants.PlayerMoveSpeed,
+    },
+    camVec,
+    GetMouseWheelMove()*2.0)    
+}
+
+
+func BoolToFloat(b bool) float32{
+  if b{
+    return 1.0
+  }
+  return 0.0
 }

@@ -1,8 +1,6 @@
 package types
 
-import (
-  // constants "blockProject/constants"
-)
+// constants "blockProject/constants"
 
 type Inventory struct {
   // not sure if this should be a 1d or 2d array but we will go with 1
@@ -14,6 +12,14 @@ type Inventory struct {
 type ItemStack struct {
   Item Item
   Count int
+}
+
+func NewInventory(MaxSlots int, OwnerType string) *Inventory {
+  return &Inventory{
+    Slots: make([]ItemStack, 0, MaxSlots),
+    MaxSlots: MaxSlots,
+    OwnerType: OwnerType,
+  }
 }
 
 func (inv *Inventory) AddItem(item Item, count int) bool {

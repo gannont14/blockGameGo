@@ -98,20 +98,11 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
     c := w.Chunks[i][j]
     drawChunk(c)
   }
-
-
-  // deprecated
-  // for i := range len(w.Chunks){
-  //   for j := range len(w.Chunks[0]){
-  //     c := w.Chunks[i][j]
-  //     if(c.ShouldBeRendered(p)){
-  //       drawChunk(c)
-  //     }
-  //   }
-  // }
 }
 
-
+func DrawInventory(inv types.Inventory) {
+  return
+}
 
 
 

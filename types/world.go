@@ -8,5 +8,6 @@ import (
 // singleton for the world
 type World struct{
   Chunks [][]Chunk
+  ItemRegistry ItemRegistry
 }
 

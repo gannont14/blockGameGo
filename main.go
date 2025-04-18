@@ -5,8 +5,8 @@ import (
 	types "blockProject/types"
 	. "blockProject/utils"
 	"fmt"
-
 	. "github.com/gen2brain/raylib-go/raylib"
+  items "blockProject/items"
 )
 
 var camera Camera3D
@@ -17,6 +17,27 @@ var renderedChunks []*types.Chunk
 
 var focusedBlock *types.Block = nil
 var inventoryDisplayed bool = false
+
+func toggleInventoryStatus(){
+  if inventoryDisplayed {
+    DisableCursor()
+    player.CanMoveCamera = true
+    inventoryDisplayed = false
+    return
+  }
+
+  EnableCursor()
+  player.CanMoveCamera = false
+  inventoryDisplayed = true
+  return
+}
+
+
+func RegisterAllItems(r *types.ItemRegistry) {
+  // there HAS to be a better way to do this
+  r.RegisterItem(items.NewRedBlockItem())
+  r.RegisterItem(items.NewBlueBlockItem())
+}
 
 func initGame(){
 
@@ -35,6 +56,12 @@ func initGame(){
   // generate the worlds test chunk
   world.Chunks = types.GenerateTestChunks(constants.NumChunksX, constants.NumChunksY)
   fmt.Println("Chunks generated")
+
+  // generate the item registry 
+  itemRegistry := types.NewItemRegistry()
+  RegisterAllItems(itemRegistry)
+
+  world.ItemRegistry = *itemRegistry
 }
 
 // all draw functions
@@ -48,6 +75,11 @@ func drawGame(){
 func drawHud(){
   // draw crosshair
   DrawCrosshair()
+
+  if inventoryDisplayed {
+    DrawInventory(*player.Inventory)
+    fmt.Println("Displaying inventory")
+  }
 
   // debug menu
   if constants.DEBUG {
@@ -89,21 +121,11 @@ func main() {
 	for !WindowShouldClose() {
 
 
-    UpdateCameraPro(&camera,                     // Absolute mess
-      Vector3{
-        X: BoolToFloat(IsKeyDown(KeyW) || IsKeyDown(KeyUp))*constants.PlayerMoveSpeed -
-           BoolToFloat(IsKeyDown(KeyS) || IsKeyDown(KeyDown))*constants.PlayerMoveSpeed,
-        Y: BoolToFloat(IsKeyDown(KeyD) || IsKeyDown(KeyRight))*constants.PlayerMoveSpeed -
-           BoolToFloat(IsKeyDown(KeyA) || IsKeyDown(KeyLeft))*constants.PlayerMoveSpeed,
-        Z: BoolToFloat(IsKeyDown(KeySpace)) * constants.PlayerMoveSpeed -
-           BoolToFloat(IsKeyDown(KeyC) || IsKeyDown(KeyLeftControl)) * constants.PlayerMoveSpeed,
-      },
-      Vector3{
-        X: GetMouseDelta().X*constants.PlayerMouseSensitivity,
-        Y: GetMouseDelta().Y*constants.PlayerMouseSensitivity,
-        Z: 0.0,
-      },
-      GetMouseWheelMove()*2.0)    
+    player.UpdatePlayerCamera(&camera)
+
+    if(IsKeyPressed(KeyE)){
+      toggleInventoryStatus()
+    }
 
 
 		BeginDrawing()

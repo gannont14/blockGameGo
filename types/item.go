@@ -30,12 +30,6 @@ func GetNewItemID() int {
 }
 
 // other interfaces for different kinds of blocks
-type PlaceableItem interface{
-  Item
-  GetBlockType() BlockType
-  Place(world *World, postion Vector3) bool
-}
-
 type ToolItem interface{
   Item
   Use(world *World, targetPos Vector3) bool
