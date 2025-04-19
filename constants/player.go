@@ -11,6 +11,8 @@ const (
   // inventory related
   PlayerInventoryRows = 4
   PlayerInventoryCols = 9
+  PlayerInventoryWidth = 500
+  PlayerInventorySlotMargin = 3
 
   // HUD Related
   // A good number would have (width - margin(numSlots + 1)) / numSlots

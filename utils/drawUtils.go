@@ -3,6 +3,8 @@ package utils
 import (
 	"blockProject/constants"
 	types "blockProject/types"
+	"fmt"
+
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -98,11 +100,6 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
   }
 }
 
-func DrawInventory(inv types.Inventory) {
-  return
-}
-
-
 /*
     this is WAY WAY WAY overengineered to be flexible with 
     different widths of the hotbar, as well as number of items
@@ -147,18 +144,61 @@ func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int
   yOffset := constants.HUDHotbarSlotMargin
   for i:=range slots{
     xOffset := (i * (slotSize + constants.HUDHotbarSlotMargin)) + constants.HUDHotbarSlotMargin
-    DrawHotBarSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize)
+    DrawItemSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray)
   }
 }
 
-func DrawHotBarSlot(is types.ItemStack, pos Vector2, slotSize int) {
+func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color) {
   DrawRectangle(
     int32(pos.X), 
     int32(pos.Y),
     int32(slotSize),
     int32(slotSize),
-    Gray,
+    col,
     )
 }
 
+func DrawInventory(inv types.Inventory){
+  // divider between inventory and hotbar items
+  dividerHeight := constants.PlayerInventorySlotMargin * 3.0
+  // total margin space on y axis (numRows + 1)
+  marginSpaceY := (constants.PlayerInventoryRows * constants.PlayerInventorySlotMargin) + dividerHeight
+  marginSpaceX := constants.PlayerInventoryCols * constants.PlayerInventorySlotMargin
+  
+  // slot size 
+  slotSize := (constants.PlayerInventoryWidth - (marginSpaceX)) / constants.PlayerInventoryCols
 
+  // calculate what the height should be
+  PlayerInventoryHeight := int(marginSpaceY) + (slotSize * constants.PlayerInventoryRows)
+
+  // calculate the origin
+  origX := (int32(GetScreenWidth()) / 2) - constants.PlayerInventoryWidth
+  origY := (int32(GetScreenHeight()) / 2) - int32(PlayerInventoryHeight)
+
+  DrawInventorySlots(inv.Slots, int(origX), int(origY), slotSize, int(dividerHeight))
+}
+
+func DrawInventorySlots(items []types.ItemStack, origX int, origY int, slotSize int, dividerHeight int){
+  for i := range items {
+    r, c := slotIndexToCoord(i)
+    xOffset := (c * (slotSize + constants.PlayerInventorySlotMargin)) + constants.PlayerInventorySlotMargin
+    yOffset := (r * (slotSize + constants.PlayerInventorySlotMargin)) + constants.PlayerInventorySlotMargin
+
+    // for vals under the divider (hotbar item)
+    if r == (constants.PlayerInventoryRows - 1){
+      yOffset += dividerHeight
+    }
+
+    DrawItemSlot(items[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray)
+  }
+}
+
+func slotIndexToCoord(ind int) (int, int) {
+  // should never go over the amount of slots
+  row := int(ind / constants.PlayerInventoryCols)
+  col := ind % constants.PlayerInventoryCols
+
+  fmt.Printf("Ind: %d, Row: %d, Col: %d\n",ind, row, col)
+
+  return row, col
+}
