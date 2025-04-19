@@ -3,8 +3,6 @@ package utils
 import (
 	"blockProject/constants"
 	types "blockProject/types"
-	// "fmt"
-
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -105,5 +103,62 @@ func DrawInventory(inv types.Inventory) {
 }
 
 
+/*
+    this is WAY WAY WAY overengineered to be flexible with 
+    different widths of the hotbar, as well as number of items
+
+*/
+func DrawHotbar(inv types.Inventory) {
+  // calculate the required values, such as height, which 
+  // would update the slots height and width
+
+  l := len(inv.Slots)
+  numHBSlots := constants.PlayerInventoryCols
+  hotbarItemStacks := inv.Slots[(l - numHBSlots): l ]
+
+  // figure out how many margins
+  numMargins := numHBSlots + 1
+
+  // How much space total the margins take up
+  xMarginSpace := (numMargins * constants.HUDHotbarSlotMargin)
+  // slot height/width
+  slotSize := (constants.HUDHotbarWidth - xMarginSpace) / numHBSlots
+  // find hotbar height now based on that
+  HUDHotbarHeight := slotSize + (2 * constants.HUDHotbarSlotMargin)
+
+  origX := int32(GetScreenWidth()/2) - (constants.HUDHotbarWidth/2)
+  origY := int32(GetScreenHeight()) - constants.HUDHotbarYOffset
+
+  // background
+  DrawRectangle(origX,
+    origY,
+    constants.HUDHotbarWidth,
+    int32(HUDHotbarHeight),
+    White,
+    )
+
+  // now draw the slots
+  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY))
+}
+
+func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int) {
+  // should be able to take variable amount of items,
+  // and display the user's hot bar items
+  yOffset := constants.HUDHotbarSlotMargin
+  for i:=range slots{
+    xOffset := (i * (slotSize + constants.HUDHotbarSlotMargin)) + constants.HUDHotbarSlotMargin
+    DrawHotBarSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize)
+  }
+}
+
+func DrawHotBarSlot(is types.ItemStack, pos Vector2, slotSize int) {
+  DrawRectangle(
+    int32(pos.X), 
+    int32(pos.Y),
+    int32(slotSize),
+    int32(slotSize),
+    Gray,
+    )
+}
 
 

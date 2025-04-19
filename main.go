@@ -17,18 +17,21 @@ var renderedChunks []*types.Chunk
 
 var focusedBlock *types.Block = nil
 var inventoryDisplayed bool = false
+var hotbarDisplayed bool = true
 
 func toggleInventoryStatus(){
   if inventoryDisplayed {
     DisableCursor()
     player.CanMoveCamera = true
     inventoryDisplayed = false
+    hotbarDisplayed = true
     return
   }
 
   EnableCursor()
   player.CanMoveCamera = false
   inventoryDisplayed = true
+  hotbarDisplayed = false
   return
 }
 
@@ -75,6 +78,10 @@ func drawGame(){
 func drawHud(){
   // draw crosshair
   DrawCrosshair()
+
+  if hotbarDisplayed {
+    DrawHotbar(*player.Inventory)
+  }
 
   if inventoryDisplayed {
     DrawInventory(*player.Inventory)

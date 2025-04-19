@@ -16,10 +16,14 @@ type ItemStack struct {
 
 func NewInventory(MaxSlots int, OwnerType string) *Inventory {
   return &Inventory{
-    Slots: make([]ItemStack, 0, MaxSlots),
+    Slots: generateEmptyItemSlots(MaxSlots),
     MaxSlots: MaxSlots,
     OwnerType: OwnerType,
   }
+}
+
+func generateEmptyItemSlots(count int) []ItemStack {
+  return make([]ItemStack, count)
 }
 
 func (inv *Inventory) AddItem(item Item, count int) bool {
