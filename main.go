@@ -65,6 +65,18 @@ func initGame(){
   RegisterAllItems(itemRegistry)
 
   world.ItemRegistry = *itemRegistry
+
+  // add random items to the player inventory
+  redblock, _ := world.ItemRegistry.GetItemByID(0)
+  player.Inventory.AddItem(redblock, 63)
+  player.Inventory.AddItem(redblock, 3)
+
+  blueblock, _ := world.ItemRegistry.GetItemByID(1)
+  player.Inventory.AddItem(blueblock, 3)
+  player.Inventory.AddItem(blueblock, 3)
+  player.Inventory.AddItem(redblock, 3)
+  player.Inventory.AddItem(blueblock, 3) // Buggy
+
 }
 
 // all draw functions

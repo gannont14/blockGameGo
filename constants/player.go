@@ -11,7 +11,7 @@ const (
   // inventory related
   PlayerInventoryRows = 4
   PlayerInventoryCols = 9
-  PlayerInventoryWidth = 500
+  PlayerInventoryWidth = 900
   PlayerInventorySlotMargin = 3
 
   // HUD Related

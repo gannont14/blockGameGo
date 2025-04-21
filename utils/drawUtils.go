@@ -101,6 +101,7 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
 }
 
 /*
+
     this is WAY WAY WAY overengineered to be flexible with 
     different widths of the hotbar, as well as number of items
 
@@ -172,13 +173,27 @@ func DrawInventory(inv types.Inventory){
   PlayerInventoryHeight := int(marginSpaceY) + (slotSize * constants.PlayerInventoryRows)
 
   // calculate the origin
-  origX := (int32(GetScreenWidth()) / 2) - constants.PlayerInventoryWidth
-  origY := (int32(GetScreenHeight()) / 2) - int32(PlayerInventoryHeight)
+  origX := (int32(GetScreenWidth()) / 2) - (constants.PlayerInventoryWidth / 2)
+  origY := (int32(GetScreenHeight()) / 2) - (int32(PlayerInventoryHeight) / 2)
 
+  bgOrigX := origX - constants.PlayerInventorySlotMargin
+  bgOrigY := origY - constants.PlayerInventorySlotMargin
+
+  // Draw the background
+  DrawRectangle(bgOrigX , bgOrigY,
+    constants.PlayerInventoryWidth + (2 * constants.PlayerInventorySlotMargin),
+    int32(PlayerInventoryHeight) + (2 * constants.PlayerInventorySlotMargin),
+    White)
+
+  // Draw the individual slots
   DrawInventorySlots(inv.Slots, int(origX), int(origY), slotSize, int(dividerHeight))
 }
 
 func DrawInventorySlots(items []types.ItemStack, origX int, origY int, slotSize int, dividerHeight int){
+
+  // figure out which slot the user is hovering over
+  activeSlot := -1
+
   for i := range items {
     r, c := slotIndexToCoord(i)
     xOffset := (c * (slotSize + constants.PlayerInventorySlotMargin)) + constants.PlayerInventorySlotMargin
@@ -188,10 +203,39 @@ func DrawInventorySlots(items []types.ItemStack, origX int, origY int, slotSize 
     if r == (constants.PlayerInventoryRows - 1){
       yOffset += dividerHeight
     }
+    col := Gray
+    origVec := NewVector2(float32(origX + xOffset), float32(origY + yOffset))
+    // check if mouse in that square
+    if pointInRectangle(GetMousePosition(), origVec, slotSize, slotSize){
+      activeSlot = i 
+      col = LightGray
+    }
 
-    DrawItemSlot(items[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray)
+    DrawItemSlot(items[i], origVec, slotSize, col)
+    drawItemStack(origVec, items[i], slotSize)
   }
+
+  types.UpdateActiveSelectedSlot(activeSlot)
 }
+
+// will always be square so the size can just be one value
+func drawItemStack(pos Vector2, is types.ItemStack, size int){
+  if is.Count == 0{
+    return
+  }
+  // for now will draw the item ID and then the count
+  itemName := fmt.Sprint(is.Item.GetName())
+  itemCount := fmt.Sprint(is.Count)
+
+  // Draw the item's ID in the center
+  DrawText(itemName, int32(pos.X), int32(pos.Y), 12, Blue)
+
+  // Daw the item's count
+  DrawText(itemCount, int32(pos.X), int32(pos.Y), 25, Red)
+
+
+}
+
 
 func slotIndexToCoord(ind int) (int, int) {
   // should never go over the amount of slots
@@ -202,3 +246,24 @@ func slotIndexToCoord(ind int) (int, int) {
 
   return row, col
 }
+
+func pointInRectangle(point Vector2, orig Vector2, height int, width int) bool {
+  // check x 
+  px := int(point.X) // annoying to type cast every time
+  ox := int(orig.X) // annoying to type cast every time
+  checkX := (px > ox) && (px < (ox + width))
+  
+  // check y
+  py := int(point.Y) // annoying to type cast every time
+  oy := int(orig.Y) // annoying to type cast every time
+  checkY := (py > oy) && (py < (oy + height))
+
+  return checkX && checkY
+}
+
+
+
+
+
+
+
