@@ -1,8 +1,5 @@
 package types
 
-import "fmt"
-
-// import "fmt"
 
 // constants "blockProject/constants"
 
