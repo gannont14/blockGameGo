@@ -2,6 +2,7 @@ package types
 
 import (
 	"blockProject/constants"
+	"fmt"
 	// "fmt"
 	. "github.com/gen2brain/raylib-go/raylib"
 )
@@ -12,6 +13,7 @@ type Player struct{
   Cam *Camera;
   Inventory *Inventory
   CanMoveCamera bool
+  ActiveItemSlot int
 }
 
 func NewPlayer(startPos Vector3, c *Camera) Player{
@@ -23,6 +25,7 @@ func NewPlayer(startPos Vector3, c *Camera) Player{
     Cam: c,
     Inventory: NewInventory(numInvSlots, "PlayerInventory"),
     CanMoveCamera: true,
+    ActiveItemSlot: 0,
   }
   return p
 }
@@ -125,6 +128,38 @@ func (p *Player) UpdatePlayerCamera(cam *Camera){
     GetMouseWheelMove()*2.0)    
 }
 
+func (p *Player) getHotBarItems() (int, []ItemStack) {
+  l := len(p.Inventory.Slots)
+  numHBSlots := constants.PlayerInventoryCols
+  hotbarItemStacks := p.Inventory.Slots[(l - numHBSlots): l ]
+
+  return numHBSlots, hotbarItemStacks
+}
+
+func (p *Player) UpdatePlayerActiveItem(){
+  // player pressed 1-9 keys 
+  pressed, slot := keyPressToSlot()
+  if pressed {
+    p.ActiveItemSlot = slot
+  }
+
+  numSlots, _ := p.getHotBarItems()
+
+  // cycle keys pressed 
+  if IsKeyPressed(KeyX) {
+    newSlot := (p.ActiveItemSlot + 1) % numSlots
+    p.ActiveItemSlot = newSlot
+  }
+
+  // cycle keys pressed 
+  if IsKeyPressed(KeyZ) {
+    // need to add the num slots incase it goes negative
+    newSlot := (p.ActiveItemSlot - 1 + numSlots) % numSlots
+    p.ActiveItemSlot = newSlot
+  }
+  fmt.Println("Active player slot: ", p.ActiveItemSlot)
+}
+
 
 func BoolToFloat(b bool) float32{
   if b{
@@ -132,3 +167,21 @@ func BoolToFloat(b bool) float32{
   }
   return 0.0
 }
+
+func keyPressToSlot() (bool, int){
+
+  if IsKeyPressed(KeyOne)   { return true, 0 }
+  if IsKeyPressed(KeyTwo)   { return true, 1 }
+  if IsKeyPressed(KeyThree) { return true, 2 }
+  if IsKeyPressed(KeyFour)  { return true, 3 }
+  if IsKeyPressed(KeyFive)  { return true, 4 }
+  if IsKeyPressed(KeySix)   { return true, 5 }
+  if IsKeyPressed(KeySeven) { return true, 6 }
+  if IsKeyPressed(KeyEight) { return true, 7 }
+  if IsKeyPressed(KeyNine)  { return true, 8 }
+
+  return false, -1
+}
+
+
+

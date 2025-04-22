@@ -20,4 +20,5 @@ const (
   HUDHotbarWidth = 698 // ... thus 698
   HUDHotbarYOffset = 90
   HUDHotbarSlotMargin = 5
+  HUDHotbarBorderThickness = 5
 )

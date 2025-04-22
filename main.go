@@ -92,7 +92,7 @@ func drawHud(){
   DrawCrosshair()
 
   if hotbarDisplayed {
-    DrawHotbar(*player.Inventory)
+    DrawHotbar(*player.Inventory, player.ActiveItemSlot)
   }
 
   if inventoryDisplayed {
@@ -124,6 +124,8 @@ func updateGame(){
 
   // find the active block that the player is looking at
   player.GenerateActiveBlock(renderedChunks, &focusedBlock)
+  // udpate what item the player is holding
+  player.UpdatePlayerActiveItem()
 
   //...
 }

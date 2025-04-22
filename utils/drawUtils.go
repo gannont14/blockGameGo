@@ -106,7 +106,7 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
     different widths of the hotbar, as well as number of items
 
 */
-func DrawHotbar(inv types.Inventory) {
+func DrawHotbar(inv types.Inventory, activeItemSlot int) {
   // calculate the required values, such as height, which 
   // would update the slots height and width
 
@@ -136,20 +136,28 @@ func DrawHotbar(inv types.Inventory) {
     )
 
   // now draw the slots
-  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY))
+  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY), activeItemSlot)
 }
 
-func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int) {
+func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int, activeSlot int) {
   // should be able to take variable amount of items,
   // and display the user's hot bar items
   yOffset := constants.HUDHotbarSlotMargin
   for i:=range slots{
+    hasBorder := false
     xOffset := (i * (slotSize + constants.HUDHotbarSlotMargin)) + constants.HUDHotbarSlotMargin
-    DrawItemSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray)
+
+    // check if it is the player's active slot
+    if i == activeSlot {
+      hasBorder = true
+    }
+
+    DrawItemSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray, hasBorder)
+    drawItemStack(NewVector2(float32(origX + xOffset), float32(origY + yOffset)),  slots[i], 12)
   }
 }
 
-func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color) {
+func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color, hasBorder bool) {
   DrawRectangle(
     int32(pos.X), 
     int32(pos.Y),
@@ -157,6 +165,16 @@ func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color) {
     int32(slotSize),
     col,
     )
+  if hasBorder {
+    // draw the active border around the item
+    rec := NewRectangle(
+      pos.X - constants.HUDHotbarBorderThickness, 
+      pos.Y - constants.HUDHotbarBorderThickness,
+      float32(slotSize + (2*constants.HUDHotbarBorderThickness)),
+      float32(slotSize + (2*constants.HUDHotbarBorderThickness)),
+      )
+    DrawRectangleLinesEx(rec, constants.HUDHotbarBorderThickness, DarkGray)
+  }
 }
 
 func DrawInventory(inv *types.Inventory){
@@ -212,7 +230,7 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
       col = LightGray
     }
 
-    DrawItemSlot(items[i], origVec, slotSize, col)
+    DrawItemSlot(items[i], origVec, slotSize, col, false)
     drawItemStack(origVec, items[i], slotSize)
     // on click handler
   }
