@@ -159,7 +159,7 @@ func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color) {
     )
 }
 
-func DrawInventory(inv types.Inventory){
+func DrawInventory(inv *types.Inventory){
   // divider between inventory and hotbar items
   dividerHeight := constants.PlayerInventorySlotMargin * 3.0
   // total margin space on y axis (numRows + 1)
@@ -186,10 +186,11 @@ func DrawInventory(inv types.Inventory){
     White)
 
   // Draw the individual slots
-  DrawInventorySlots(inv.Slots, int(origX), int(origY), slotSize, int(dividerHeight))
+  DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight))
 }
 
-func DrawInventorySlots(items []types.ItemStack, origX int, origY int, slotSize int, dividerHeight int){
+func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int){
+  items := inv.Slots
 
   // figure out which slot the user is hovering over
   activeSlot := -1
@@ -213,14 +214,22 @@ func DrawInventorySlots(items []types.ItemStack, origX int, origY int, slotSize 
 
     DrawItemSlot(items[i], origVec, slotSize, col)
     drawItemStack(origVec, items[i], slotSize)
+    // on click handler
   }
 
   types.UpdateActiveSelectedSlot(activeSlot)
+  // after the draw call, make sure that there is an active slot
+  if IsMouseButtonPressed(MouseLeftButton) {
+    // update the inventory accordignly
+    inv.HandleItemClick(activeSlot)
+  }
+  // PrintPlayerHand(inv)
+  drawItemStack(GetMousePosition(), inv.Hand, 12)
 }
 
 // will always be square so the size can just be one value
 func drawItemStack(pos Vector2, is types.ItemStack, size int){
-  if is.Count == 0{
+  if is.Item == nil{
     return
   }
   // for now will draw the item ID and then the count
@@ -232,8 +241,6 @@ func drawItemStack(pos Vector2, is types.ItemStack, size int){
 
   // Daw the item's count
   DrawText(itemCount, int32(pos.X), int32(pos.Y), 25, Red)
-
-
 }
 
 
@@ -242,7 +249,7 @@ func slotIndexToCoord(ind int) (int, int) {
   row := int(ind / constants.PlayerInventoryCols)
   col := ind % constants.PlayerInventoryCols
 
-  fmt.Printf("Ind: %d, Row: %d, Col: %d\n",ind, row, col)
+  // fmt.Printf("Ind: %d, Row: %d, Col: %d\n",ind, row, col)
 
   return row, col
 }
@@ -260,10 +267,6 @@ func pointInRectangle(point Vector2, orig Vector2, height int, width int) bool {
 
   return checkX && checkY
 }
-
-
-
-
 
 
 

@@ -96,8 +96,8 @@ func drawHud(){
   }
 
   if inventoryDisplayed {
-    DrawInventory(*player.Inventory)
-    fmt.Println("Displaying inventory")
+    DrawInventory(player.Inventory)
+    // fmt.Println("Displaying inventory")
   }
 
   // debug menu

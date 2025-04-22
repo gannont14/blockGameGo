@@ -39,5 +39,13 @@ func DrawDebugActiveBlock(b *types.Block){
 
   blockText := fmt.Sprintf("Block Type: %d", b.Type)
   DrawText(blockText, int32(textPos.X), int32(textPos.Y), 20, Black)
+}
 
+func PrintPlayerHand(inv *types.Inventory){
+  // item
+  if inv.Hand.Item == nil {
+    fmt.Println("No Item")
+    return
+  }
+  fmt.Printf("Hand| ID: %d, Count: %d\n", inv.Hand.Item.GetID(), inv.Hand.Count)
 }
