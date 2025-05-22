@@ -19,7 +19,10 @@ type BlockItem struct{
 
 func (b *BlockItem) GetBlockType() BlockType { return b.Type }
 
-func (b *BlockItem) Place(world *World, pos Vector3) bool {
+func (b *BlockItem) Place(world *World, chunkInd ChunkIndex, blockInd BlockIndex) bool {
+  // validate the position
+  //val := world.ValidatePosition()
+
 
   // implement later
   return true

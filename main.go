@@ -16,6 +16,7 @@ var renderedChunkIndeces []types.ChunkIndex
 var renderedChunks []*types.Chunk
 
 var focusedBlock *types.Block = nil
+var potentialBlockPosition *types.BlockPosition = nil
 var inventoryDisplayed bool = false
 var hotbarDisplayed bool = true
 
@@ -106,6 +107,9 @@ func drawHud(){
     DrawDebugPlayerPos(player)
     // render focused block
     DrawDebugActiveBlock(focusedBlock)
+    if(potentialBlockPosition != nil){
+      DrawDebugBlockPosition(*potentialBlockPosition)
+    }
     // render FPS
     DrawDebugPlayerFPS()
   }
@@ -123,7 +127,7 @@ func updateGame(){
   renderedChunks = types.GetChunksFromIndeces(renderedChunkIndeces, &world)
 
   // find the active block that the player is looking at
-  player.GenerateActiveBlock(renderedChunks, &focusedBlock)
+  player.GenerateActiveBlock(renderedChunks, &focusedBlock, &potentialBlockPosition, &world)
   // udpate what item the player is holding
   player.UpdatePlayerActiveItem()
 

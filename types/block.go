@@ -24,6 +24,24 @@ type Block struct{
   BoundBox BoundingBox
 }
 
+type BlockIndex struct {
+  I int
+  J int
+  K int
+}
+
+func NewBlockIndex(i int, j int, k int) BlockIndex {
+  return BlockIndex{
+    I: i,
+    J: j,
+    K: k,
+  }
+}
+
+func (bi *BlockIndex) UnboxBlockIndex() (int, int, int) {
+  return bi.I, bi.J, bi.K
+}
+
 func NewBlock(t BlockType, pos Vector3, chunkId int) Block{
   // generate bounding box min and max based on position vector
   bbMin := pos

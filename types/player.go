@@ -2,8 +2,8 @@ package types
 
 import (
 	"blockProject/constants"
-	"fmt"
-	// "fmt"
+	"math"
+
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -30,8 +30,7 @@ func NewPlayer(startPos Vector3, c *Camera) Player{
   return p
 }
 
-func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block) {
-
+func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block, potentialBlockPosition **BlockPosition, w *World) {
   // create ray of player in direciton
   playerLookRay := NewRay(
     p.Cam.Position,
@@ -57,6 +56,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
   var blockChunk *Chunk
   blockHit := false
   *focusedBlock = nil
+  var coll RayCollision
   // loop through the active chunks to find
   for _, c := range activeChunks{
     // loop through blocks in said chunk 
@@ -70,7 +70,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
           }
 
           // check if player look array collides
-          coll := GetRayCollisionBox(playerLookRay, c.Blocks[i][j][k].BoundBox)
+          coll = GetRayCollisionBox(playerLookRay, c.Blocks[i][j][k].BoundBox)
 
           if coll.Hit{
             if coll.Distance < closestDistance && coll.Distance < constants.PlayerHighlightRange{
@@ -91,6 +91,15 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
   if blockHit {
     blockChunk.Blocks[closeI][closeJ][closeK].Focused = true
     *focusedBlock = &blockChunk.Blocks[closeI][closeJ][closeK]
+    if IsKeyPressed(KeyF) {
+      // find the face
+      b := *focusedBlock
+      orig := b.CenterPoint()
+      face := determineHitFace(orig, coll.Point)
+      *potentialBlockPosition = w.PlaceBlock(
+        *focusedBlock,
+        face, **focusedBlock) // TODO, change to block in the palyer's hand
+    }
   }
 }
 
@@ -157,7 +166,7 @@ func (p *Player) UpdatePlayerActiveItem(){
     newSlot := (p.ActiveItemSlot - 1 + numSlots) % numSlots
     p.ActiveItemSlot = newSlot
   }
-  fmt.Println("Active player slot: ", p.ActiveItemSlot)
+  // fmt.Println("Active player slot: ", p.ActiveItemSlot)
 }
 
 
@@ -181,6 +190,43 @@ func keyPressToSlot() (bool, int){
   if IsKeyPressed(KeyNine)  { return true, 8 }
 
   return false, -1
+}
+
+
+func determineHitFace(blockOrigin Vector3, hitPoint Vector3) int {
+  // figure out which axis has highest absolute value 
+
+  // difference between origin and hitPoint
+  diffVector := Vector3Subtract(hitPoint, blockOrigin)
+
+  absX := math.Floor(float64(diffVector.X))
+  absY := math.Floor(float64(diffVector.Y))
+  absZ := math.Floor(float64(diffVector.Z))
+
+  if absX >= absY && absX >= absZ { // X Greatest
+    if diffVector.X > 0{
+      // positve X 
+      return constants.BlockHitFacePosX
+    }
+    // negative x
+    return constants.BlockHitFaceNegX
+
+  } else if absY >= absX && absY >= absZ { // Y Greatest
+    if diffVector.Y > 0{
+      // positve Y 
+      return constants.BlockHitFacePosY
+    }
+    // negative Y
+    return constants.BlockHitFaceNegY
+
+  } else { // Z Greatest
+    if diffVector.Z > 0{
+      // positve Z 
+      return constants.BlockHitFacePosZ
+    }
+    // negative Z
+    return constants.BlockHitFaceNegZ
+  }
 }
 
 
