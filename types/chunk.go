@@ -64,6 +64,9 @@ func GenerateTestChunk(orig Vector3) Chunk{
         if y == 0{
           b.Type = RedBlock
         }
+				if x == 0 && y == 4 && z == 0 {
+          b.Type = BlueBlock
+			}
 
         // // hard code to test
         // if y == 1{

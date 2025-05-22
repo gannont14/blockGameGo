@@ -2,7 +2,7 @@ package types
 
 import (
 	"blockProject/constants"
-	"math"
+	"fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
 )
@@ -30,7 +30,12 @@ func NewPlayer(startPos Vector3, c *Camera) Player{
   return p
 }
 
-func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block, potentialBlockPosition **BlockPosition, w *World) {
+func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
+	focusedBlock **Block,
+	focusedBlockPosition **BlockPosition,
+	potentialBlock **Block,
+	potentialBlockPosition **BlockPosition,
+	w *World) {
   // create ray of player in direciton
   playerLookRay := NewRay(
     p.Cam.Position,
@@ -52,10 +57,14 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
   // could replace with largest float value, whatever that may be
   closestDistance := float32(9999999)
   // due to odd bug with looking toward origin would cause multiple blocks to be selected
+	var playerColl RayCollision
   var closeI, closeJ, closeK int
   var blockChunk *Chunk
   blockHit := false
   *focusedBlock = nil
+  *focusedBlockPosition = nil
+  *potentialBlockPosition = nil
+  *potentialBlock = nil
   var coll RayCollision
   // loop through the active chunks to find
   for _, c := range activeChunks{
@@ -80,6 +89,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
               closeI, closeJ, closeK = i, j, k
               blockHit = true
               blockChunk = c
+							playerColl = coll
             }
           } 
         }
@@ -88,19 +98,25 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
   }
 
   // NOW we check and highlight the block
-  if blockHit {
-    blockChunk.Blocks[closeI][closeJ][closeK].Focused = true
-    *focusedBlock = &blockChunk.Blocks[closeI][closeJ][closeK]
-    if IsKeyPressed(KeyF) {
-      // find the face
-      b := *focusedBlock
-      orig := b.CenterPoint()
-      face := determineHitFace(orig, coll.Point)
-      *potentialBlockPosition = w.PlaceBlock(
-        *focusedBlock,
-        face, **focusedBlock) // TODO, change to block in the palyer's hand
-    }
-  }
+	if blockHit {
+		blockChunk.Blocks[closeI][closeJ][closeK].Focused = true
+		*focusedBlock = &blockChunk.Blocks[closeI][closeJ][closeK]
+		// if IsKeyPressed(KeyF) {
+		// find the face
+		b := *focusedBlock
+
+		// set the focusedBlockPosition
+		focBlockPosition := w.worldPosToBlockPosition(b.WorldPos)
+		*focusedBlockPosition = &focBlockPosition
+
+		orig := b.CenterPoint()
+		face := determineHitFace(orig, playerColl.Point)
+		*potentialBlockPosition = w.GetPotentialBlock(
+			*focusedBlock,
+			face, **focusedBlock) // TODO, change to block in the palyer's hand
+		*potentialBlock = w.BlockPositionToBlock(*potentialBlockPosition)
+		// }
+	}
 }
 
 func (p *Player) scaledPlayerLookDirection() Vector3{
@@ -195,38 +211,44 @@ func keyPressToSlot() (bool, int){
 
 func determineHitFace(blockOrigin Vector3, hitPoint Vector3) int {
   // figure out which axis has highest absolute value 
+	if constants.DEBUG {
+		DrawText(fmt.Sprintf("hitPoint: [%f, %f, %f]", hitPoint.X, hitPoint.Y, hitPoint.Z), 
+			10,
+			130,
+			20,
+			Black,
+			)
+		DrawText(fmt.Sprintf("blockOrigin: [%f, %f, %f]", blockOrigin.X, blockOrigin.Y, blockOrigin.Z), 
+			10,
+			150,
+			20,
+			Black,
+			)
+	}
 
   // difference between origin and hitPoint
   diffVector := Vector3Subtract(hitPoint, blockOrigin)
 
-  absX := math.Floor(float64(diffVector.X))
-  absY := math.Floor(float64(diffVector.Y))
-  absZ := math.Floor(float64(diffVector.Z))
+	if constants.DEBUG {
+		DrawText(fmt.Sprintf("diffVector: [%f, %f, %f]", diffVector.X, diffVector.Y, diffVector.Z), 
+			10,
+			170,
+			20,
+			Black,
+			)
+	}
 
-  if absX >= absY && absX >= absZ { // X Greatest
-    if diffVector.X > 0{
-      // positve X 
-      return constants.BlockHitFacePosX
-    }
-    // negative x
-    return constants.BlockHitFaceNegX
+	// determine which value of diff vector is exactly even
+	if int(diffVector.Z) ==  1 {return constants.BlockHitFacePosZ}
+	if int(diffVector.Z) == -1 {return constants.BlockHitFaceNegZ}
+	if int(diffVector.X) ==  1 {return constants.BlockHitFacePosX}
+	if int(diffVector.X) == -1 {return constants.BlockHitFaceNegX}
+	if int(diffVector.Y) ==  1 {return constants.BlockHitFacePosY}
+	if int(diffVector.Y) == -1 {return constants.BlockHitFaceNegY}
 
-  } else if absY >= absX && absY >= absZ { // Y Greatest
-    if diffVector.Y > 0{
-      // positve Y 
-      return constants.BlockHitFacePosY
-    }
-    // negative Y
-    return constants.BlockHitFaceNegY
+	// default return
+	return constants.BlockHitFacePosY
 
-  } else { // Z Greatest
-    if diffVector.Z > 0{
-      // positve Z 
-      return constants.BlockHitFacePosZ
-    }
-    // negative Z
-    return constants.BlockHitFaceNegZ
-  }
 }
 
 

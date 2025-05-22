@@ -50,14 +50,20 @@ func PrintPlayerHand(inv *types.Inventory){
   fmt.Printf("Hand| ID: %d, Count: %d\n", inv.Hand.Item.GetID(), inv.Hand.Count)
 }
 
-func DrawDebugBlockPosition(bp types.BlockPosition){
-  text := fmt.Sprintf("Chunk Index: \n[Row: %d, Col: %d]\n\nBlock Index: \n[I: %d,J: %d,K: %d]\n\n",
-    bp.ChunkIndex.Row,
-    bp.ChunkIndex.Col,
-    bp.BlockIndex.I,
-    bp.BlockIndex.J,
-    bp.BlockIndex.K,
-    )
+func DrawDebugBlockPosition(bp *types.BlockPosition, t string, offset int){
+	var text string
+	if bp == nil {
+		text = fmt.Sprintf("%-10s: nil", t)
+	}else {
+		text = fmt.Sprintf("%-10s: Chunk Index: [Row: %d, Col: %d] Block Index: [I: %d,J: %d,K: %d]",
+			t,
+			bp.ChunkIndex.Row,
+			bp.ChunkIndex.Col,
+			bp.BlockIndex.I,
+			bp.BlockIndex.J,
+			bp.BlockIndex.K,
+			)
+	}
 
-  DrawText(text, 10, 70, 20, Black)
+  DrawText(text, 10, int32(70 + offset), 20, Black)
 }
