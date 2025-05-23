@@ -101,7 +101,6 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 	if blockHit {
 		blockChunk.Blocks[closeI][closeJ][closeK].Focused = true
 		*focusedBlock = &blockChunk.Blocks[closeI][closeJ][closeK]
-		// if IsKeyPressed(KeyF) {
 		// find the face
 		b := *focusedBlock
 
@@ -115,6 +114,12 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 			*focusedBlock,
 			face, **focusedBlock) // TODO, change to block in the palyer's hand
 		*potentialBlock = w.BlockPositionToBlock(*potentialBlockPosition)
+		// place the block
+		if IsKeyPressed(KeyF) {
+			p.Inventory.Slots[p.ActiveItemSlot].Item.Interact()
+			
+
+		}
 		// }
 	}
 }

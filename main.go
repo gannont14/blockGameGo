@@ -165,7 +165,6 @@ func main() {
       toggleInventoryStatus()
     }
 
-
 		BeginDrawing()
     ClearBackground(RayWhite)
 

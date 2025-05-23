@@ -4,7 +4,7 @@ const (
   // world and player related
   RenderDistance = 3
   PlayerMoveSpeed = 0.2
-  PlayerMouseSensitivity = 0.1
+  PlayerMouseSensitivity = 0.06
   PlayerHeight = 3
   PlayerHighlightRange = 10.0
 

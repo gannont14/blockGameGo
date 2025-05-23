@@ -9,6 +9,7 @@ type PlaceableItem interface{
   Item
   GetBlockType() BlockType
   Place(world *World, postion Vector3) bool
+  Interact(world *World, activeBP *BlockPosition) bool
 }
 
 type BlockItem struct{
@@ -26,7 +27,6 @@ func (b *BlockItem) Place(world *World, chunkInd ChunkIndex, blockInd BlockIndex
 
   // implement later
   return true
-
 }
 
 
