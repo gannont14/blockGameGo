@@ -19,7 +19,7 @@ const (
 type Block struct{
   Type BlockType
   WorldPos Vector3
-  ChunkId int
+  BlockPosition BlockPosition
   Focused bool
   BoundBox BoundingBox
 }
@@ -42,7 +42,7 @@ func (bi *BlockIndex) UnboxBlockIndex() (int, int, int) {
   return bi.I, bi.J, bi.K
 }
 
-func NewBlock(t BlockType, pos Vector3, chunkId int) Block{
+func NewBlock(t BlockType, pos Vector3, bp BlockPosition) Block{
   // generate bounding box min and max based on position vector
   bbMin := pos
   bbMax := Vector3Add(bbMin, 
@@ -58,7 +58,7 @@ func NewBlock(t BlockType, pos Vector3, chunkId int) Block{
   b := Block{
     Type: t,
     WorldPos: pos,
-    ChunkId: chunkId,
+    BlockPosition: bp,
     Focused: false,
     BoundBox: NewBoundingBox(bbMin, bbMax),
   }

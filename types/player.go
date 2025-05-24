@@ -116,7 +116,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 		*potentialBlock = w.BlockPositionToBlock(*potentialBlockPosition)
 		// place the block
 		if IsKeyPressed(KeyF) {
-			p.Inventory.Slots[p.ActiveItemSlot].Item.Interact()
+			//p.Inventory.Slots[p.ActiveItemSlot].Item.Interact()
 			
 
 		}

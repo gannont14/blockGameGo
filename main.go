@@ -116,6 +116,8 @@ func drawHud(){
     DrawDebugPlayerPos(player)
     // render focused block
     DrawDebugActiveBlock(focusedBlock)
+		// DrawDebugBlockPosition(&focusedBlock.BlockPosition, "TESTING FOCUSED", 80)
+		// DrawDebugBlockPosition(&potentialBlock.BlockPosition, "TESTING ACTIVE", 100)
 		DrawDebugBlockPosition(focusedBlockPosition, "Active", 0)
 		DrawDebugBlockPosition(potentialBlockPosition, "Potential", 20)
 		// render FPS

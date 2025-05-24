@@ -37,7 +37,13 @@ func DrawDebugActiveBlock(b *types.Block){
     return
   }
 
-  blockText := fmt.Sprintf("Block Type: %d", b.Type)
+  blockText := fmt.Sprintf("Block Type: %d BlockPosition: Chunk Index: [Row: %d, Col: %d] Block Index: [I: %d,J: %d,K: %d]", b.Type,
+			b.BlockPosition.ChunkIndex.Row,
+			b.BlockPosition.ChunkIndex.Col,
+			b.BlockPosition.BlockIndex.I,
+			b.BlockPosition.BlockIndex.J,
+			b.BlockPosition.BlockIndex.K,
+    )
   DrawText(blockText, int32(textPos.X), int32(textPos.Y), 20, Black)
 }
 
