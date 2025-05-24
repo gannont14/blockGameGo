@@ -15,7 +15,7 @@ import (
 func NewRedBlockItem() *types.BlockItem {
   return &types.BlockItem{
     BaseItem: types.BaseItem{
-      ID: types.GetNewItemID(), // will this work without static?
+      Id: types.GetNewItemID(), // will this work without static?
       Name: "Red Block",
       MaxStackSize: 64,
     },
@@ -27,7 +27,7 @@ func NewRedBlockItem() *types.BlockItem {
 func NewBlueBlockItem() *types.BlockItem {
   return &types.BlockItem{
     BaseItem: types.BaseItem{
-      ID: types.GetNewItemID(),
+      Id: types.GetNewItemID(),
       Name: "Blue Block",
       MaxStackSize: 64,
     },

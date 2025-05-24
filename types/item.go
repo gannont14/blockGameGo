@@ -1,25 +1,29 @@
 package types
 
 import (
-	. "github.com/gen2brain/raylib-go/raylib"
+	// . "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Item interface {
-  GetID() int
-  GetName() string
+  GetId() int 
+  GetName() string 
   GetMaxStackSize() int
+  Interact(InteractionContext) bool
 }
 
-type BaseItem struct{
-  ID int
-  Name string
-  MaxStackSize int
-}
-
-// base item interface methods
-func (b *BaseItem) GetID() int { return b.ID }
+func (b *BaseItem) GetId() int { return b.Id }
 func (b *BaseItem) GetName() string { return b.Name }
 func (b *BaseItem) GetMaxStackSize() int { return b.MaxStackSize }
+
+type BaseItem struct {
+  Id int 
+  Name string 
+  MaxStackSize int 
+}
+
+func (b *BaseItem) Interact(ctx InteractionContext) bool {
+  return false
+}
 
 // helper function to get an unused itemID
 var nextItemId int = 0
@@ -29,12 +33,3 @@ func GetNewItemID() int {
   return ret
 }
 
-// other interfaces for different kinds of blocks
-type ToolItem interface{
-  Item
-  Use(world *World, targetPos Vector3) bool
-  GetDurability() int
-  // GetToolType() 
-  // set durability
-  // ...
-}

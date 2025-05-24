@@ -65,6 +65,13 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition) Block{
   return b
 }
 
+func (old *Block) Replace (new *Block) {
+  // replace all attributes
+  old.Type          = new.Type
+  old.Focused       = new.Focused
+  // other attributes that should be replaced in the future
+}
+
 func (b *Block) CenterPoint() Vector3{
   // calculate the center point of a block
   v := NewVector3(
@@ -74,6 +81,16 @@ func (b *Block) CenterPoint() Vector3{
     )
 
   return v
+}
+
+func (b *Block) IsReplaceable() bool {
+  switch b.Type {
+  case Air:
+  // ... add more replaceable and fallthroughs
+    return true
+  default:
+    return false
+  }
 }
 
 func (b *Block) BlockColor() Color{

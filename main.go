@@ -38,7 +38,6 @@ func toggleInventoryStatus(){
   return
 }
 
-
 func RegisterAllItems(r *types.ItemRegistry) {
   // there HAS to be a better way to do this
   r.RegisterItem(items.NewRedBlockItem())

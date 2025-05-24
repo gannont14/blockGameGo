@@ -53,7 +53,7 @@ func PrintPlayerHand(inv *types.Inventory){
     fmt.Println("No Item")
     return
   }
-  fmt.Printf("Hand| ID: %d, Count: %d\n", inv.Hand.Item.GetID(), inv.Hand.Count)
+  fmt.Printf("Hand| ID: %d, Count: %d\n", inv.Hand.Item.GetId(), inv.Hand.Count)
 }
 
 func DrawDebugBlockPosition(bp *types.BlockPosition, t string, offset int){

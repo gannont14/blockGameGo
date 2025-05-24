@@ -19,13 +19,14 @@ type Player struct{
 func NewPlayer(startPos Vector3, c *Camera) Player{
   // find the number of slots the player should have
   numInvSlots := constants.PlayerInventoryCols * constants.PlayerInventoryRows
+  activeSlot := constants.PlayerInventoryCols * (constants.PlayerInventoryRows - 1)
   p := Player{
     Id: 0,
     Pos: startPos,
     Cam: c,
     Inventory: NewInventory(numInvSlots, "PlayerInventory"),
     CanMoveCamera: true,
-    ActiveItemSlot: 0,
+    ActiveItemSlot: activeSlot, // The first item of the players hotbar
   }
   return p
 }
@@ -110,17 +111,37 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 
 		orig := b.CenterPoint()
 		face := determineHitFace(orig, playerColl.Point)
-		*potentialBlockPosition = w.GetPotentialBlock(
-			*focusedBlock,
-			face, **focusedBlock) // TODO, change to block in the palyer's hand
-		*potentialBlock = w.BlockPositionToBlock(*potentialBlockPosition)
+    potentialBlockPosition := w.GetPotentialBlock(
+      *focusedBlock,
+      face, **focusedBlock)
+    *potentialBlock = w.BlockPositionToBlock(potentialBlockPosition)
+
+    if *potentialBlock != nil {
+      (*potentialBlock).BlockPosition = *potentialBlockPosition
+    }
 		// place the block
 		if IsKeyPressed(KeyF) {
-			//p.Inventory.Slots[p.ActiveItemSlot].Item.Interact()
-			
+      icx := NewInteractionContext(
+        w,
+        p,
+        *focusedBlock,
+        *potentialBlock,
+        RIGHT_CLICK,
+        )
+      activeItemStack := &p.Inventory.Slots[p.ActiveItemSlot]
 
+      if(activeItemStack.Item == nil || activeItemStack.Count <= 0){
+        return
+      }
+
+			if activeItemStack.Item.Interact(icx) {
+        // decrease inventory
+        activeItemStack.Count--
+        if activeItemStack.Count <= 0 {
+          activeItemStack.nillify()
+        }
+      }
 		}
-		// }
 	}
 }
 
@@ -200,15 +221,17 @@ func BoolToFloat(b bool) float32{
 
 func keyPressToSlot() (bool, int){
 
-  if IsKeyPressed(KeyOne)   { return true, 0 }
-  if IsKeyPressed(KeyTwo)   { return true, 1 }
-  if IsKeyPressed(KeyThree) { return true, 2 }
-  if IsKeyPressed(KeyFour)  { return true, 3 }
-  if IsKeyPressed(KeyFive)  { return true, 4 }
-  if IsKeyPressed(KeySix)   { return true, 5 }
-  if IsKeyPressed(KeySeven) { return true, 6 }
-  if IsKeyPressed(KeyEight) { return true, 7 }
-  if IsKeyPressed(KeyNine)  { return true, 8 }
+  offset := constants.HotbarOffset
+
+  if IsKeyPressed(KeyOne)   { return true, offset + 0 }
+  if IsKeyPressed(KeyTwo)   { return true, offset + 1 }
+  if IsKeyPressed(KeyThree) { return true, offset + 2 }
+  if IsKeyPressed(KeyFour)  { return true, offset + 3 }
+  if IsKeyPressed(KeyFive)  { return true, offset + 4 }
+  if IsKeyPressed(KeySix)   { return true, offset + 5 }
+  if IsKeyPressed(KeySeven) { return true, offset + 6 }
+  if IsKeyPressed(KeyEight) { return true, offset + 7 }
+  if IsKeyPressed(KeyNine)  { return true, offset + 8 }
 
   return false, -1
 }

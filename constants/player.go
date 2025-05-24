@@ -14,6 +14,8 @@ const (
   PlayerInventoryWidth = 900
   PlayerInventorySlotMargin = 3
 
+  HotbarOffset = PlayerInventoryCols * (PlayerInventoryRows - 1)
+
   // HUD Related
   // A good number would have (width - margin(numSlots + 1)) / numSlots
   //          be a relatively even number

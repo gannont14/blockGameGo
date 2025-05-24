@@ -41,6 +41,34 @@ func validBlockPos(bp BlockPosition) bool {
 
 }
 
+/*
+  Checks to see if the potential block already has something there
+  RETURN: boolean if position is valid
+*/
+func (w *World) ValidateBlockPlacement(bp BlockPosition) bool {
+  b := w.BlockPositionToBlock(&bp)
+
+  // check to make sure that the type is a replaceable type,
+  // right now, this is just the air block
+  if b.IsReplaceable() {
+    return true
+  }
+
+  return false
+}
+
+/*
+  Places Block at block position within world
+  RETURN: nada
+*/
+func (w *World) PlaceBlockAtBlockPosition(b *Block, bp *BlockPosition) {
+  // set the block at the block positon to the new one
+  currentBlock := w.BlockPositionToBlock(bp)
+
+  // replaces all attributes of the pointer
+  currentBlock.Replace(b)
+}
+
 func (w *World) BlockPositionToBlock(bp *BlockPosition) *Block {
 	if !validBlockPos(*bp) { return nil }
 	ci := bp.ChunkIndex
@@ -83,9 +111,9 @@ func blockFaceToBlock(blockPos BlockPosition, face int)  (BlockPosition, bool) {
 
   // determine if that difference is outside of the bounds of the chunk
   // only need to check the X and Z,
-  if dX + blockPos.BlockIndex.I > constants.ChunkSizeX { nBlockPos.ChunkIndex.Row += 1 }
+  if dX + blockPos.BlockIndex.I >= constants.ChunkSizeX { nBlockPos.ChunkIndex.Row += 1 }
   if dX + blockPos.BlockIndex.I <          0           { nBlockPos.ChunkIndex.Row -= 1 }
-  if dZ + blockPos.BlockIndex.K > constants.ChunkSizeZ { nBlockPos.ChunkIndex.Col += 1 }
+  if dZ + blockPos.BlockIndex.K >= constants.ChunkSizeZ { nBlockPos.ChunkIndex.Col += 1 }
   if dZ + blockPos.BlockIndex.K <          0           { nBlockPos.ChunkIndex.Col -= 1 }
 
 	                                                      // ensure it's a positive value
