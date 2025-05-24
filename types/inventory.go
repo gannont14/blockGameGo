@@ -1,7 +1,9 @@
 package types
 
 
-// constants "blockProject/constants"
+import (
+  // constants "blockProject/constants"
+)
 
 var activeSelectedSlot int = -1
 
@@ -95,7 +97,7 @@ func (inv *Inventory) updateItemSlot(itemSlot int) (bool, ItemStack) {
   }
 
   // slot has the same item...
-  if slot.Item.GetID() == inv.Hand.Item.GetID(){
+  if slot.Item.GetId() == inv.Hand.Item.GetId(){
     // check if there is room to add, or if they can only add so many
     // player is just adding to current stack
     if slot.Count + inv.Hand.Count <= slot.Item.GetMaxStackSize(){
@@ -126,7 +128,7 @@ func (inv *Inventory) nextSlot (item Item, count int) (int, bool) {
     if currItem.Item == nil { return idx, false }
 
     // item of same type in slot, with enough room, could get rid of nested loop
-    if currItem.Item.GetID() == item.GetID() {
+    if currItem.Item.GetId() == item.GetId() {
       // make sure that there is enough room
       if currItem.Count + count <= currItem.Item.GetMaxStackSize(){
         return idx, true

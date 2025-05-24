@@ -44,8 +44,7 @@ func GetChunksFromIndeces(idcs []ChunkIndex, w *World) []*Chunk{
   return c
 }
 
-func GenerateTestChunk(orig Vector3) Chunk{
-  // count := 0
+func GenerateTestChunk(orig Vector3, row int, col int) Chunk{
   var ch Chunk
   ch.Origin = orig
   // generate a test chunk with a layer of red blocks and the rest air
@@ -57,13 +56,16 @@ func GenerateTestChunk(orig Vector3) Chunk{
         b := NewBlock(
           Air, 
           Vector3Add(ch.Origin, blockOffset(x, y, z)),
-          0,
+          NewBlockPosition(NewChunkIndex(col, row), NewBlockIndex(x, y, z)),
           )
 
         // hard code to be the floor
         if y == 0{
           b.Type = RedBlock
         }
+				if x == 0 && y == 4 && z == 0 {
+          b.Type = BlueBlock
+			}
 
         // // hard code to test
         // if y == 1{
@@ -90,7 +92,7 @@ func GenerateTestChunks(xChunks int, yChunks int) [][]Chunk{
       zOffset := ChunkTotalWidth() * float32(i)
       xOffset := ChunkTotalDepth() * float32(j)
       o := NewVector3(xOffset, 0.0, zOffset)
-      s = append(s, GenerateTestChunk(o))
+      s = append(s, GenerateTestChunk(o, i, j))
       fmt.Printf("Chunk [%d, %d] generated\nAt Origin [%f, %f, %f]\n",
         i, j, o.X, o.Y, o.Z)
     }
@@ -196,7 +198,6 @@ func (c *Chunk) ShouldBeRendered(p Player) bool {
 
   return true
 }
-
 
 
 

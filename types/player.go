@@ -3,7 +3,7 @@ package types
 import (
 	"blockProject/constants"
 	"fmt"
-	// "fmt"
+
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -19,19 +19,24 @@ type Player struct{
 func NewPlayer(startPos Vector3, c *Camera) Player{
   // find the number of slots the player should have
   numInvSlots := constants.PlayerInventoryCols * constants.PlayerInventoryRows
+  activeSlot := constants.PlayerInventoryCols * (constants.PlayerInventoryRows - 1)
   p := Player{
     Id: 0,
     Pos: startPos,
     Cam: c,
     Inventory: NewInventory(numInvSlots, "PlayerInventory"),
     CanMoveCamera: true,
-    ActiveItemSlot: 0,
+    ActiveItemSlot: activeSlot, // The first item of the players hotbar
   }
   return p
 }
 
-func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block) {
-
+func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
+	focusedBlock **Block,
+	focusedBlockPosition **BlockPosition,
+	potentialBlock **Block,
+	potentialBlockPosition **BlockPosition,
+	w *World) {
   // create ray of player in direciton
   playerLookRay := NewRay(
     p.Cam.Position,
@@ -53,10 +58,15 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
   // could replace with largest float value, whatever that may be
   closestDistance := float32(9999999)
   // due to odd bug with looking toward origin would cause multiple blocks to be selected
+	var playerColl RayCollision
   var closeI, closeJ, closeK int
   var blockChunk *Chunk
   blockHit := false
   *focusedBlock = nil
+  *focusedBlockPosition = nil
+  *potentialBlockPosition = nil
+  *potentialBlock = nil
+  var coll RayCollision
   // loop through the active chunks to find
   for _, c := range activeChunks{
     // loop through blocks in said chunk 
@@ -70,7 +80,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
           }
 
           // check if player look array collides
-          coll := GetRayCollisionBox(playerLookRay, c.Blocks[i][j][k].BoundBox)
+          coll = GetRayCollisionBox(playerLookRay, c.Blocks[i][j][k].BoundBox)
 
           if coll.Hit{
             if coll.Distance < closestDistance && coll.Distance < constants.PlayerHighlightRange{
@@ -80,6 +90,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
               closeI, closeJ, closeK = i, j, k
               blockHit = true
               blockChunk = c
+							playerColl = coll
             }
           } 
         }
@@ -88,10 +99,50 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk, focusedBlock **Block
   }
 
   // NOW we check and highlight the block
-  if blockHit {
-    blockChunk.Blocks[closeI][closeJ][closeK].Focused = true
-    *focusedBlock = &blockChunk.Blocks[closeI][closeJ][closeK]
-  }
+	if blockHit {
+		blockChunk.Blocks[closeI][closeJ][closeK].Focused = true
+		*focusedBlock = &blockChunk.Blocks[closeI][closeJ][closeK]
+		// find the face
+		b := *focusedBlock
+
+		// set the focusedBlockPosition
+		focBlockPosition := w.worldPosToBlockPosition(b.WorldPos)
+		*focusedBlockPosition = &focBlockPosition
+
+		orig := b.CenterPoint()
+		face := determineHitFace(orig, playerColl.Point)
+    potentialBlockPosition := w.GetPotentialBlock(
+      *focusedBlock,
+      face, **focusedBlock)
+    *potentialBlock = w.BlockPositionToBlock(potentialBlockPosition)
+
+    if *potentialBlock != nil {
+      (*potentialBlock).BlockPosition = *potentialBlockPosition
+    }
+		// place the block
+		if IsKeyPressed(KeyF) {
+      icx := NewInteractionContext(
+        w,
+        p,
+        *focusedBlock,
+        *potentialBlock,
+        RIGHT_CLICK,
+        )
+      activeItemStack := &p.Inventory.Slots[p.ActiveItemSlot]
+
+      if(activeItemStack.Item == nil || activeItemStack.Count <= 0){
+        return
+      }
+
+			if activeItemStack.Item.Interact(icx) {
+        // decrease inventory
+        activeItemStack.Count--
+        if activeItemStack.Count <= 0 {
+          activeItemStack.nillify()
+        }
+      }
+		}
+	}
 }
 
 func (p *Player) scaledPlayerLookDirection() Vector3{
@@ -157,7 +208,7 @@ func (p *Player) UpdatePlayerActiveItem(){
     newSlot := (p.ActiveItemSlot - 1 + numSlots) % numSlots
     p.ActiveItemSlot = newSlot
   }
-  fmt.Println("Active player slot: ", p.ActiveItemSlot)
+  // fmt.Println("Active player slot: ", p.ActiveItemSlot)
 }
 
 
@@ -170,17 +221,62 @@ func BoolToFloat(b bool) float32{
 
 func keyPressToSlot() (bool, int){
 
-  if IsKeyPressed(KeyOne)   { return true, 0 }
-  if IsKeyPressed(KeyTwo)   { return true, 1 }
-  if IsKeyPressed(KeyThree) { return true, 2 }
-  if IsKeyPressed(KeyFour)  { return true, 3 }
-  if IsKeyPressed(KeyFive)  { return true, 4 }
-  if IsKeyPressed(KeySix)   { return true, 5 }
-  if IsKeyPressed(KeySeven) { return true, 6 }
-  if IsKeyPressed(KeyEight) { return true, 7 }
-  if IsKeyPressed(KeyNine)  { return true, 8 }
+  offset := constants.HotbarOffset
+
+  if IsKeyPressed(KeyOne)   { return true, offset + 0 }
+  if IsKeyPressed(KeyTwo)   { return true, offset + 1 }
+  if IsKeyPressed(KeyThree) { return true, offset + 2 }
+  if IsKeyPressed(KeyFour)  { return true, offset + 3 }
+  if IsKeyPressed(KeyFive)  { return true, offset + 4 }
+  if IsKeyPressed(KeySix)   { return true, offset + 5 }
+  if IsKeyPressed(KeySeven) { return true, offset + 6 }
+  if IsKeyPressed(KeyEight) { return true, offset + 7 }
+  if IsKeyPressed(KeyNine)  { return true, offset + 8 }
 
   return false, -1
+}
+
+
+func determineHitFace(blockOrigin Vector3, hitPoint Vector3) int {
+  // figure out which axis has highest absolute value 
+	if constants.DEBUG {
+		DrawText(fmt.Sprintf("hitPoint: [%f, %f, %f]", hitPoint.X, hitPoint.Y, hitPoint.Z), 
+			10,
+			130,
+			20,
+			Black,
+			)
+		DrawText(fmt.Sprintf("blockOrigin: [%f, %f, %f]", blockOrigin.X, blockOrigin.Y, blockOrigin.Z), 
+			10,
+			150,
+			20,
+			Black,
+			)
+	}
+
+  // difference between origin and hitPoint
+  diffVector := Vector3Subtract(hitPoint, blockOrigin)
+
+	if constants.DEBUG {
+		DrawText(fmt.Sprintf("diffVector: [%f, %f, %f]", diffVector.X, diffVector.Y, diffVector.Z), 
+			10,
+			170,
+			20,
+			Black,
+			)
+	}
+
+	// determine which value of diff vector is exactly even
+	if int(diffVector.Z) ==  1 {return constants.BlockHitFacePosZ}
+	if int(diffVector.Z) == -1 {return constants.BlockHitFaceNegZ}
+	if int(diffVector.X) ==  1 {return constants.BlockHitFacePosX}
+	if int(diffVector.X) == -1 {return constants.BlockHitFaceNegX}
+	if int(diffVector.Y) ==  1 {return constants.BlockHitFacePosY}
+	if int(diffVector.Y) == -1 {return constants.BlockHitFaceNegY}
+
+	// default return
+	return constants.BlockHitFacePosY
+
 }
 
 

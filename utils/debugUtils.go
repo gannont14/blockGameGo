@@ -37,7 +37,13 @@ func DrawDebugActiveBlock(b *types.Block){
     return
   }
 
-  blockText := fmt.Sprintf("Block Type: %d", b.Type)
+  blockText := fmt.Sprintf("Block Type: %d BlockPosition: Chunk Index: [Row: %d, Col: %d] Block Index: [I: %d,J: %d,K: %d]", b.Type,
+			b.BlockPosition.ChunkIndex.Row,
+			b.BlockPosition.ChunkIndex.Col,
+			b.BlockPosition.BlockIndex.I,
+			b.BlockPosition.BlockIndex.J,
+			b.BlockPosition.BlockIndex.K,
+    )
   DrawText(blockText, int32(textPos.X), int32(textPos.Y), 20, Black)
 }
 
@@ -47,5 +53,23 @@ func PrintPlayerHand(inv *types.Inventory){
     fmt.Println("No Item")
     return
   }
-  fmt.Printf("Hand| ID: %d, Count: %d\n", inv.Hand.Item.GetID(), inv.Hand.Count)
+  fmt.Printf("Hand| ID: %d, Count: %d\n", inv.Hand.Item.GetId(), inv.Hand.Count)
+}
+
+func DrawDebugBlockPosition(bp *types.BlockPosition, t string, offset int){
+	var text string
+	if bp == nil {
+		text = fmt.Sprintf("%-10s: nil", t)
+	}else {
+		text = fmt.Sprintf("%-10s: Chunk Index: [Row: %d, Col: %d] Block Index: [I: %d,J: %d,K: %d]",
+			t,
+			bp.ChunkIndex.Row,
+			bp.ChunkIndex.Col,
+			bp.BlockIndex.I,
+			bp.BlockIndex.J,
+			bp.BlockIndex.K,
+			)
+	}
+
+  DrawText(text, 10, int32(70 + offset), 20, Black)
 }

@@ -22,7 +22,7 @@ func NewItemRegistry() *ItemRegistry{
 }
 
 func (r *ItemRegistry) RegisterItem (item Item) {
-  id := item.GetID()
+  id := item.GetId()
 
   // make sure that the item isn't already registed
   if existing, exists := r.items[id]; exists {

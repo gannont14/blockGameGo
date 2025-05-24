@@ -19,12 +19,30 @@ const (
 type Block struct{
   Type BlockType
   WorldPos Vector3
-  ChunkId int
+  BlockPosition BlockPosition
   Focused bool
   BoundBox BoundingBox
 }
 
-func NewBlock(t BlockType, pos Vector3, chunkId int) Block{
+type BlockIndex struct {
+  I int
+  J int
+  K int
+}
+
+func NewBlockIndex(i int, j int, k int) BlockIndex {
+  return BlockIndex{
+    I: i,
+    J: j,
+    K: k,
+  }
+}
+
+func (bi *BlockIndex) UnboxBlockIndex() (int, int, int) {
+  return bi.I, bi.J, bi.K
+}
+
+func NewBlock(t BlockType, pos Vector3, bp BlockPosition) Block{
   // generate bounding box min and max based on position vector
   bbMin := pos
   bbMax := Vector3Add(bbMin, 
@@ -40,11 +58,18 @@ func NewBlock(t BlockType, pos Vector3, chunkId int) Block{
   b := Block{
     Type: t,
     WorldPos: pos,
-    ChunkId: chunkId,
+    BlockPosition: bp,
     Focused: false,
     BoundBox: NewBoundingBox(bbMin, bbMax),
   }
   return b
+}
+
+func (old *Block) Replace (new *Block) {
+  // replace all attributes
+  old.Type          = new.Type
+  old.Focused       = new.Focused
+  // other attributes that should be replaced in the future
 }
 
 func (b *Block) CenterPoint() Vector3{
@@ -56,6 +81,16 @@ func (b *Block) CenterPoint() Vector3{
     )
 
   return v
+}
+
+func (b *Block) IsReplaceable() bool {
+  switch b.Type {
+  case Air:
+  // ... add more replaceable and fallthroughs
+    return true
+  default:
+    return false
+  }
 }
 
 func (b *Block) BlockColor() Color{
