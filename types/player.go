@@ -160,7 +160,7 @@ func (p *Player) handleBreaking(
     breakingManager *BreakingManager) {
     
     // Check if left mouse button is held down
-    if IsMouseButtonDown(MouseButtonLeft) {
+    if IsMouseButtonDown(MouseButtonLeft) || IsKeyDown(KeyT) {
         // Are we already breaking this block?
         if breakingManager.IsPlayerBreaking(p) {
             currentTarget := breakingManager.GetBreakingTarget(p)
@@ -183,14 +183,14 @@ func (p *Player) handleBreaking(
             // Block is already handled by the manager
             
         case BreakingResultInProgress:
-            // Still breaking - could add visual/audio feedback here
+            // In progress
             progress := breakingManager.GetProgress(p)
             if constants.DEBUG {
                 DrawText(fmt.Sprintf("Breaking: %.1f%%", progress*100), 10, 190, 20, Red)
             }
             
         case BreakingResultNone:
-            // This shouldn't happen if we just started breaking
+            // SHould never happen?
             fmt.Println("Warning: Breaking result was None")
         }
         

@@ -161,9 +161,19 @@ func (bm *BreakingManager)calculateBreakTime(block *Block, tool Item) float64 {
   // get the blockItem from the itemManager
   blockItem := bm.ItemRegistry.GetBlockByItemType(block.Type)
 
-  // TODO: implement the effeciency based on tools, could implement switch, or more complex
+  // get the tool the player is holding
+  tool, isTool := tool.(*ToolItem)
 
-  return blockItem.BaseBreakTime
+	// if it is a tool, then check what the speed is
+	// default will just be 1
+	speed := 1.0
+	if isTool {
+		speed = tool.(*ToolItem).Speed
+	}
+	// TODO: need to add checks to type of block, like 
+	// an axe breakign wood faster and things like that
+  
+  return blockItem.BaseBreakTime / speed
 }
 
 func (bm *BreakingManager) GetBreakingTarget(p *Player) *Block {

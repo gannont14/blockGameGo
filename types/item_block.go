@@ -8,6 +8,7 @@ type BlockHardness int
 
 const(
   BaseLevel BlockHardness = iota
+  WoodLevel
   StoneLevel
   IronLevel
   GoldLevel
@@ -26,6 +27,8 @@ func (b *BlockItem) Interact(ctx InteractionContext) bool {
   switch ctx.InteractionType{
   // LEFT CLICK - Break the Block
   case LEFT_CLICK:
+  // not sure if going to keep the keyPressed for the interaction context,
+  //the left click is mostly handled by the breaking manager
 
 
 

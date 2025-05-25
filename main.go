@@ -43,6 +43,11 @@ func RegisterAllItems(r *types.ItemRegistry) {
   // there HAS to be a better way to do this
   r.RegisterItem(items.NewRedBlockItem())
   r.RegisterItem(items.NewBlueBlockItem())
+  r.RegisterItem(items.NewWoodenPickaxeItem())
+  r.RegisterItem(items.NewStonePickaxeItem())
+  r.RegisterItem(items.NewIronPickaxeItem())
+  r.RegisterItem(items.NewGoldPickaxeItem())
+  r.RegisterItem(items.NewDiamondPickaxeItem())
 }
 
 func initGame(){
@@ -81,6 +86,13 @@ func initGame(){
   player.Inventory.AddItem(blueblock, 3)
   player.Inventory.AddItem(redblock, 3)
   player.Inventory.AddItem(blueblock, 3) // Buggy
+
+  woodenPick, _ := world.ItemRegistry.GetItemByID(2)
+  player.Inventory.AddItem(woodenPick, 1)
+  player.Inventory.AddItem(woodenPick, 1)
+
+  stonePick, _ := world.ItemRegistry.GetItemByID(3)
+  player.Inventory.AddItem(stonePick, 1)
 
 }
 
