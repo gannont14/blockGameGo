@@ -21,7 +21,8 @@ func NewWoodenPickaxeItem() *types.ToolItem {
       MaxStackSize: 1,
     },
     Durability: 200,
-    ToolType: types.ToolWoodenPickaxe,
+    ToolType: types.ToolTypePickaxe,
+    ToolLevel: types.ToolLevelWooden,
     BreakLevel: types.BreakLevelWood,
     Speed: 2,
   }
@@ -36,7 +37,8 @@ func NewStonePickaxeItem() *types.ToolItem {
       MaxStackSize: 1,
     },
     Durability: 400,
-    ToolType: types.ToolStonePickaxe,
+    ToolType: types.ToolTypePickaxe,
+    ToolLevel: types.ToolLevelStone,
     BreakLevel: types.BreakLevelWood,
     Speed: 3,
   }
@@ -51,7 +53,8 @@ func NewIronPickaxeItem() *types.ToolItem {
       MaxStackSize: 1,
     },
     Durability: 800,
-    ToolType: types.ToolIronPickaxe,
+    ToolType: types.ToolTypePickaxe,
+    ToolLevel: types.ToolLevelIron,
     BreakLevel: types.BreakLevelWood,
     Speed: 4,
   }
@@ -65,8 +68,9 @@ func NewGoldPickaxeItem() *types.ToolItem {
       Name: "Gold Pickaxe",
       MaxStackSize: 1,
     },
-    Durability: 1600,
-    ToolType: types.ToolGoldPickaxe,
+    Durability: 200,
+    ToolType: types.ToolTypePickaxe,
+    ToolLevel: types.ToolLevelGold,
     BreakLevel: types.BreakLevelWood,
     Speed: 5,
   }
@@ -80,7 +84,8 @@ func NewDiamondPickaxeItem() *types.ToolItem {
       MaxStackSize: 1,
     },
     Durability: 3200,
-    ToolType: types.ToolDiamondPickaxe,
+    ToolType: types.ToolTypePickaxe,
+    ToolLevel: types.ToolLevelDiamond,
     BreakLevel: types.BreakLevelWood,
     Speed: 6,
   }

@@ -20,6 +20,7 @@ func NewRedBlockItem() *types.BlockItem {
       MaxStackSize: 64,
     },
     Type: types.RedBlock,
+    PrefToolType: types.ToolTypePickaxe,
     BaseBreakTime: 3.0,
     BlockHardness: types.BaseLevel,
   }
@@ -34,6 +35,7 @@ func NewBlueBlockItem() *types.BlockItem {
       MaxStackSize: 64,
     },
     Type: types.BlueBlock,
+    PrefToolType: types.ToolTypeNone,
     BaseBreakTime: 3.0,
     BlockHardness: types.BaseLevel,
   }

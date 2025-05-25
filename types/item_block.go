@@ -18,6 +18,7 @@ const(
 type BlockItem struct{
   BaseItem
   Type BlockType
+	PrefToolType ToolType
   BaseBreakTime float64 // base break time if it is possible to break with tool
   BlockHardness BlockHardness
 }

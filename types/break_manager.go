@@ -2,7 +2,7 @@ package types
 
 import (
 	"blockProject/constants"
-	"fmt"
+	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
 )
@@ -105,7 +105,7 @@ func (bm *BreakingManager) UpdateBreaking(p *Player, w *World) BreakingResult {
   elapsed := currentTime - info.StartTime
 
   info.Progress = float32(elapsed / info.Duration)
-  fmt.Println("Breaking progress: ", info.Progress, "%")
+  // fmt.Println("Breaking progress: ", info.Progress, "%")
 
   // check if break is done
   if info.Progress >= 1.0 {
@@ -119,9 +119,9 @@ func (bm *BreakingManager) UpdateBreaking(p *Player, w *World) BreakingResult {
 }
 
 func (bm *BreakingManager) StopBreaking(p *Player){
-  if info, wasBreaking := bm.ActiveBreaking[p]; wasBreaking{
+  if _, wasBreaking := bm.ActiveBreaking[p]; wasBreaking{
     // other information about player done breaking 
-    fmt.Println("Player stopped breaking at ", info.Progress, "%")
+    // fmt.Println("Player stopped breaking at ", info.Progress, "%")
     delete(bm.ActiveBreaking, p)
   }
 }
@@ -168,7 +168,10 @@ func (bm *BreakingManager)calculateBreakTime(block *Block, tool Item) float64 {
 	// default will just be 1
 	speed := 1.0
 	if isTool {
-		speed = tool.(*ToolItem).Speed
+		// type is good, now make sure it's the correct tool
+		if tool.(*ToolItem).ToolType == blockItem.PrefToolType {
+			speed = tool.(*ToolItem).Speed
+		}
 	}
 	// TODO: need to add checks to type of block, like 
 	// an axe breakign wood faster and things like that
