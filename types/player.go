@@ -127,7 +127,7 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
       bm)
 
 		// place the block
-		if IsKeyPressed(KeyF) {
+		if IsKeyPressed(KeyF) || IsMouseButtonPressed(MouseButtonRight) {
       icx := NewInteractionContext(
         w,
         p,
@@ -155,49 +155,56 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 }
 
 func (p *Player) handleBreaking(
-    focusedBlock *Block, 
-    w *World, 
-    breakingManager *BreakingManager) {
-    
-    // Check if left mouse button is held down
-    if IsMouseButtonDown(MouseButtonLeft) || IsKeyDown(KeyT) {
-        // Are we already breaking this block?
-        if breakingManager.IsPlayerBreaking(p) {
-            currentTarget := breakingManager.GetBreakingTarget(p)
-            if currentTarget != focusedBlock {
-                // Player switched to a different block - start breaking the new one
-                breakingManager.StopBreaking(p)
-                breakingManager.StartBreaking(p, focusedBlock)
-            }
-        } else {
-            // Start breaking this block
-            breakingManager.StartBreaking(p, focusedBlock)
-        }
-        
-        // Update the breaking progress
-        result := breakingManager.UpdateBreaking(p, w)
-        
-        switch result {
-        case BreakingResultComplete:
-            fmt.Println("Successfully broke the block!")
-            // Block is already handled by the manager
-            
-        case BreakingResultInProgress:
-            // In progress
-            progress := breakingManager.GetProgress(p)
-            if constants.DEBUG {
-                DrawText(fmt.Sprintf("Breaking: %.1f%%", progress*100), 10, 190, 20, Red)
-            }
-            
-        case BreakingResultNone:
-            // SHould never happen?
-            fmt.Println("Warning: Breaking result was None")
-        }
-        
-    } else {
-        // Mouse button not held - stop breaking
-        breakingManager.StopBreaking(p)
-    }
+	focusedBlock *Block, 
+	w *World, 
+	breakingManager *BreakingManager) {
+
+	// Check if left mouse button is held down
+	if IsMouseButtonDown(MouseButtonLeft) || IsKeyDown(KeyT) {
+		// Are we already breaking this block?
+		if breakingManager.IsPlayerBreaking(p) {
+			currentTarget := breakingManager.GetBreakingTarget(p)
+			if currentTarget != focusedBlock {
+				// Player switched to a different block - start breaking the new one
+				breakingManager.StopBreaking(p)
+				breakingManager.StartBreaking(p, focusedBlock)
+			}
+			// check to see if the player switch tools
+			tool, _ := p.GetActiveItem()
+			if tool != breakingManager.GetItemUsed(p) {
+				// restart, switched tools
+				breakingManager.StopBreaking(p)
+				breakingManager.StartBreaking(p, focusedBlock)
+			}
+		} else {
+			// Start breaking this block
+			breakingManager.StartBreaking(p, focusedBlock)
+		}
+
+		// Update the breaking progress
+		result := breakingManager.UpdateBreaking(p, w)
+
+		switch result {
+		case BreakingResultComplete:
+			fmt.Println("Successfully broke the block!")
+		// Block is already handled by the manager
+
+		case BreakingResultInProgress:
+			// In progress
+			progress := breakingManager.GetProgress(p)
+			if constants.DEBUG {
+				DrawText(fmt.Sprintf("Breaking: %.1f%%", progress*100), 10, 190, 20, Red)
+			}
+
+		case BreakingResultNone:
+			// SHould never happen?
+			fmt.Println("Warning: Breaking result was None")
+		}
+
+	} else {
+		// Mouse button not held - stop breaking
+		breakingManager.StopBreaking(p)
+	}
 }
 
 func (p *Player) scaledPlayerLookDirection() Vector3{

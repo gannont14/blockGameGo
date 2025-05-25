@@ -176,6 +176,14 @@ func (bm *BreakingManager)calculateBreakTime(block *Block, tool Item) float64 {
   return blockItem.BaseBreakTime / speed
 }
 
+func (bm *BreakingManager) GetItemUsed(p *Player) Item {
+	if info, exists := bm.ActiveBreaking[p] ; exists {
+		return info.ToolUsed
+	}
+
+	return nil
+}
+
 func (bm *BreakingManager) GetBreakingTarget(p *Player) *Block {
   if info, exists := bm.ActiveBreaking[p] ; exists {
     return info.TargetBlock
