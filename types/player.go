@@ -35,8 +35,9 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 	focusedBlock **Block,
 	focusedBlockPosition **BlockPosition,
 	potentialBlock **Block,
-	potentialBlockPosition **BlockPosition,
-	w *World) {
+  potentialBlockPosition **BlockPosition,
+  w *World,
+  bm *BreakingManager) {
   // create ray of player in direciton
   playerLookRay := NewRay(
     p.Cam.Position,
@@ -119,6 +120,12 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
     if *potentialBlock != nil {
       (*potentialBlock).BlockPosition = *potentialBlockPosition
     }
+
+    // handle the breaking
+    p.handleBreaking(*focusedBlock,
+      w,
+      bm)
+
 		// place the block
 		if IsKeyPressed(KeyF) {
       icx := NewInteractionContext(
@@ -142,7 +149,55 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
         }
       }
 		}
-	}
+	} else {
+    bm.StopBreaking(p)
+  }
+}
+
+func (p *Player) handleBreaking(
+    focusedBlock *Block, 
+    w *World, 
+    breakingManager *BreakingManager) {
+    
+    // Check if left mouse button is held down
+    if IsMouseButtonDown(MouseButtonLeft) {
+        // Are we already breaking this block?
+        if breakingManager.IsPlayerBreaking(p) {
+            currentTarget := breakingManager.GetBreakingTarget(p)
+            if currentTarget != focusedBlock {
+                // Player switched to a different block - start breaking the new one
+                breakingManager.StopBreaking(p)
+                breakingManager.StartBreaking(p, focusedBlock)
+            }
+        } else {
+            // Start breaking this block
+            breakingManager.StartBreaking(p, focusedBlock)
+        }
+        
+        // Update the breaking progress
+        result := breakingManager.UpdateBreaking(p, w)
+        
+        switch result {
+        case BreakingResultComplete:
+            fmt.Println("Successfully broke the block!")
+            // Block is already handled by the manager
+            
+        case BreakingResultInProgress:
+            // Still breaking - could add visual/audio feedback here
+            progress := breakingManager.GetProgress(p)
+            if constants.DEBUG {
+                DrawText(fmt.Sprintf("Breaking: %.1f%%", progress*100), 10, 190, 20, Red)
+            }
+            
+        case BreakingResultNone:
+            // This shouldn't happen if we just started breaking
+            fmt.Println("Warning: Breaking result was None")
+        }
+        
+    } else {
+        // Mouse button not held - stop breaking
+        breakingManager.StopBreaking(p)
+    }
 }
 
 func (p *Player) scaledPlayerLookDirection() Vector3{
@@ -152,6 +207,72 @@ func (p *Player) scaledPlayerLookDirection() Vector3{
   normViewDir := Vector3Normalize(viewDirection)
 
   return normViewDir
+}
+
+func (p *Player) PlaceBlock(ctx InteractionContext, b *BlockItem) bool {
+  // validate active item
+  // activeItem := ctx.Player.Inventory.Slots[ctx.Player.ActiveItemSlot].Item
+  // validate the potential block position
+  val := ctx.World.ValidateBlockPlacement(ctx.PotentialBlock.BlockPosition)
+
+  if !val { return false }
+
+
+  // now actually place the block and handle inventory
+  // ctx.World.PlaceBlockAtBlockPosition(activeItem,
+  //   &ctx.PotentialBlock.BlockPosition)
+
+  // block replacement code for now
+  ctx.PotentialBlock.Type = b.Type
+  ctx.PotentialBlock.Focused = true
+
+  return true
+}
+
+func (p *Player) BreakBlock(info *BreakingInfo, bm *BreakingManager) {
+  // copy so that we can do calculations after the block has been broken
+  blockCopy := *info.TargetBlock 
+  airBlock := NewBlock(Air, info.TargetBlock.WorldPos, info.TargetBlock.BlockPosition)
+  // replace block with air 
+  info.TargetBlock.Replace(&airBlock)
+
+  targetBlockItem := bm.ItemRegistry.GetBlockByItemType(blockCopy.Type)
+  // handle tool degrading
+  activeItem, isTool := p.GetActiveItem()
+  itemShouldDrop := targetBlockItem.IsValidTool(activeItem)
+
+  // handle block dropping functionality here
+  if itemShouldDrop {
+    fmt.Println("Dropping Item")
+  }
+
+  if isTool {
+    // knock down durability
+    activeItem.(*ToolItem).DegradeTool()
+  }
+}
+
+/*
+    Gets the tool the user is holding
+    Item: What the actual item is 
+    bool: Whether or not the item is a tool
+*/
+
+func (p *Player) GetActiveItem() (Item, bool) {
+  // active slot
+  activeSlot := p.Inventory.Slots[p.ActiveItemSlot]
+
+  // Nothing in hand
+  if activeSlot.Item == nil || activeSlot.Count <= 0{
+    return nil, false
+  }
+
+  // something in hand, check if it's a tool
+  item := activeSlot.Item
+
+  _, isTool := item.(*ToolItem)
+
+  return item, isTool
 }
 
 func (p *Player) UpdatePlayerCamera(cam *Camera){

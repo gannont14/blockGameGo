@@ -4,11 +4,21 @@ import (
 	// . "github.com/gen2brain/raylib-go/raylib"
 )
 
+type BlockHardness int 
 
+const(
+  BaseLevel BlockHardness = iota
+  StoneLevel
+  IronLevel
+  GoldLevel
+  DiamondLevel
+)
 
 type BlockItem struct{
   BaseItem
   Type BlockType
+  BaseBreakTime float64 // base break time if it is possible to break with tool
+  BlockHardness BlockHardness
 }
 
 
@@ -22,29 +32,23 @@ func (b *BlockItem) Interact(ctx InteractionContext) bool {
 
   // RIGHT CLICK - Place the item
   case RIGHT_CLICK:
-    // validate active item
-    // activeItem := ctx.Player.Inventory.Slots[ctx.Player.ActiveItemSlot].Item
-    // validate the potential block position
-    val := ctx.World.ValidateBlockPlacement(ctx.PotentialBlock.BlockPosition)
-
-    if !val { return false }
-
-
-    // now actually place the block and handle inventory
-    // ctx.World.PlaceBlockAtBlockPosition(activeItem,
-    //   &ctx.PotentialBlock.BlockPosition)
-
-    // block replacement code for now
-    ctx.PotentialBlock.Type = b.Type
-    ctx.PotentialBlock.Focused = true
-
-    return true
+    return ctx.Player.PlaceBlock(ctx, b) // returns true on success or false
   }
-
-
 
   // implement later
   return false
 }
 
 
+func (b *BlockItem) IsValidTool(item Item) bool{
+  breakLevel := BreakLevelBase
+  // check if it's even a tool
+  tool, isTool := item.(*ToolItem)
+
+  // if it's a tool, it could have a higher break level
+  if isTool {
+    breakLevel = tool.BreakLevel
+  }
+
+  return breakLevel >= BreakLevel(b.BlockHardness)
+}

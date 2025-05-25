@@ -42,6 +42,18 @@ func (r *ItemRegistry) GetItemByID(id int) (Item, bool) {
   return item, true
 }
 
+func (r *ItemRegistry) GetBlockByItemType(BlockType BlockType) *BlockItem {
+  for _, item := range r.items {
+    if blockItem, ok := item.(*BlockItem); ok{
+      if blockItem.Type == BlockType {
+        return blockItem
+      }
+    }
+  }
+
+  return nil
+}
+
 func (r *ItemRegistry) GetAllItems() []Item {
   res := make([]Item, 0, len(r.items))
 

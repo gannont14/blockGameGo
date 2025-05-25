@@ -11,6 +11,11 @@ type Item interface {
   Interact(InteractionContext) bool
 }
 
+func (b *BaseItem) Interact(ctx InteractionContext) bool {
+  return false
+}
+
+
 func (b *BaseItem) GetId() int { return b.Id }
 func (b *BaseItem) GetName() string { return b.Name }
 func (b *BaseItem) GetMaxStackSize() int { return b.MaxStackSize }
@@ -19,10 +24,6 @@ type BaseItem struct {
   Id int 
   Name string 
   MaxStackSize int 
-}
-
-func (b *BaseItem) Interact(ctx InteractionContext) bool {
-  return false
 }
 
 // helper function to get an unused itemID

@@ -20,6 +20,8 @@ func NewRedBlockItem() *types.BlockItem {
       MaxStackSize: 64,
     },
     Type: types.RedBlock,
+    BaseBreakTime: 3.0,
+    BlockHardness: types.BaseLevel,
   }
 }
 
@@ -32,5 +34,7 @@ func NewBlueBlockItem() *types.BlockItem {
       MaxStackSize: 64,
     },
     Type: types.BlueBlock,
+    BaseBreakTime: 3.0,
+    BlockHardness: types.BaseLevel,
   }
 }

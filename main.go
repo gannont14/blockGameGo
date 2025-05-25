@@ -14,6 +14,7 @@ var player types.Player
 var world types.World
 var renderedChunkIndeces []types.ChunkIndex
 var renderedChunks []*types.Chunk
+var breakingManager types.BreakingManager
 
 var focusedBlock *types.Block = nil
 var focusedBlockPosition *types.BlockPosition = nil
@@ -67,6 +68,8 @@ func initGame(){
   RegisterAllItems(itemRegistry)
 
   world.ItemRegistry = *itemRegistry
+  // create the block breaking manager
+  breakingManager = *types.NewBreakingManager(world.ItemRegistry)
 
   // add random items to the player inventory
   redblock, _ := world.ItemRegistry.GetItemByID(0)
@@ -141,7 +144,8 @@ func updateGame(){
 		&focusedBlockPosition,
 		&potentialBlock,
 		&potentialBlockPosition,
-		&world)
+		&world,
+    &breakingManager)
   // udpate what item the player is holding
   player.UpdatePlayerActiveItem()
 

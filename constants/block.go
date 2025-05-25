@@ -14,4 +14,7 @@ const (
   BlockHitFacePosY = 3
   BlockHitFaceNegZ = 4
   BlockHitFacePosZ = 5
+
+  // Block breaking information
+  DefaultBreakTime = 3.0
 )

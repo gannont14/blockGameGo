@@ -148,7 +148,7 @@ func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int
     xOffset := (i * (slotSize + constants.HUDHotbarSlotMargin)) + constants.HUDHotbarSlotMargin
 
     // check if it is the player's active slot
-    fmt.Printf("Current: %d Active: %d\n", i, activeSlot)
+    // fmt.Printf("Current: %d Active: %d\n", i, activeSlot)
     if i == activeSlot - constants.HotbarOffset {
       hasBorder = true
     }
