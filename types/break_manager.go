@@ -162,6 +162,11 @@ func (bm *BreakingManager)calculateBreakTime(block *Block, tool Item) float64 {
   blockItem := bm.ItemRegistry.GetBlockByItemType(block.Type)
 
   // TODO: implement the effeciency based on tools, could implement switch, or more complex
+  // get the tool the player is holding
+  // tool, isTool := tool.(*ToolItem)
+
+
+  
 
   return blockItem.BaseBreakTime
 }

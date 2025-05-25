@@ -8,6 +8,7 @@ type BreakLevel int
 
 const (
   BreakLevelBase BreakLevel = iota // Base break level for all 
+  BreakLevelWood
   BreakLevelStone
   BreakLevelIron
   BreakLevelGold
@@ -18,7 +19,7 @@ const (
 type ToolItem struct{
   BaseItem
   Durability int 
-  ToolType int // could be changed to own type
+  ToolType ToolType // could be changed to own type
   BreakLevel BreakLevel
   Speed int // could also be added to the tooltype type, type type type
 }
@@ -39,3 +40,43 @@ func (t *ToolItem) DegradeTool() {
   }
 }
 
+
+/*
+  Types
+*/
+
+
+type ToolType int 
+
+const (
+  //  Wooden tools
+  ToolWoodenAxe ToolType = iota
+  ToolWoodenPickaxe
+  ToolWoodenSword
+  ToolWoodenShovel
+  ToolWoodenHoe
+  //  Stone Tools
+  ToolStoneAxe
+  ToolStonePickaxe
+  ToolStoneSword
+  ToolStoneShovel
+  ToolStoneHoe
+  //  Iron Tools
+  ToolIronAxe
+  ToolIronPickaxe
+  ToolIronSword
+  ToolIronShovel
+  ToolIronHoe
+  //  Gold Tools
+  ToolGoldAxe
+  ToolGoldPickaxe
+  ToolGoldSword
+  ToolGoldShovel
+  ToolGoldHoe
+  //  Diamond Tools
+  ToolDiamondAxe
+  ToolDiamondPickaxe
+  ToolDiamondSword
+  ToolDiamondShovel
+  ToolDiamondHoe
+)
