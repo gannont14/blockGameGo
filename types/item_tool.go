@@ -21,7 +21,7 @@ type ToolItem struct{
   Durability int 
   ToolType ToolType // could be changed to own type
   BreakLevel BreakLevel
-  Speed int // could also be added to the tooltype type, type type type
+  Speed float64 // could also be added to the tooltype type, type type type
 }
 
 func (t *ToolItem) Interact(ctx InteractionContext) bool {
