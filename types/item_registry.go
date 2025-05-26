@@ -33,6 +33,16 @@ func (r *ItemRegistry) RegisterItem (item Item) {
   r.items[id] = item
 }
 
+func (r *ItemRegistry) GetItemByName(itemName string) (Item, bool) {
+	for _, item := range r.items {
+		if item.GetName() == itemName { 
+			return item, true
+		}
+	}
+
+	return nil, false
+}
+
 func (r *ItemRegistry) GetItemByID(id int) (Item, bool) {
   item, exists := r.items[id]
   if !exists {

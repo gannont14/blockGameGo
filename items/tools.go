@@ -6,6 +6,81 @@ import (
 
 // Actual Tools now
 
+
+/*
+   Shovels
+*/
+
+func NewWoodenShovelItem() *types.ToolItem {
+	return &types.ToolItem{
+		BaseItem: types.BaseItem{
+			Id:           types.GetNewItemID(),
+			Name:         "Wooden Shovel",
+			MaxStackSize: 1,
+		},
+		Durability: 200,
+		ToolType:   types.ToolTypeShovel,
+		ToolLevel:  types.ToolLevelWooden,
+		Speed:      2,
+	}
+}
+
+func NewStoneShovelItem() *types.ToolItem {
+	return &types.ToolItem{
+		BaseItem: types.BaseItem{
+			Id:           types.GetNewItemID(),
+			Name:         "Stone Shovel",
+			MaxStackSize: 1,
+		},
+		Durability: 400,
+		ToolType:   types.ToolTypeShovel,
+		ToolLevel:  types.ToolLevelStone,
+		Speed:      3,
+	}
+}
+
+func NewIronShovelItem() *types.ToolItem {
+	return &types.ToolItem{
+		BaseItem: types.BaseItem{
+			Id:           types.GetNewItemID(),
+			Name:         "Iron Shovel",
+			MaxStackSize: 1,
+		},
+		Durability: 800,
+		ToolType:   types.ToolTypeShovel,
+		ToolLevel:  types.ToolLevelIron,
+		Speed:      4,
+	}
+}
+
+func NewGoldShovelItem() *types.ToolItem {
+	return &types.ToolItem{
+		BaseItem: types.BaseItem{
+			Id:           types.GetNewItemID(),
+			Name:         "Gold Shovel",
+			MaxStackSize: 1,
+		},
+		Durability: 200,
+		ToolType:   types.ToolTypeShovel,
+		ToolLevel:  types.ToolLevelGold,
+		Speed:      5,
+	}
+}
+
+func NewDiamondShovelItem() *types.ToolItem {
+	return &types.ToolItem{
+		BaseItem: types.BaseItem{
+			Id:           types.GetNewItemID(),
+			Name:         "Diamond Shovel",
+			MaxStackSize: 1,
+		},
+		Durability: 3200,
+		ToolType:   types.ToolTypeShovel,
+		ToolLevel:  types.ToolLevelDiamond,
+		Speed:      6,
+	}
+}
+
 /*
    Axes
 */

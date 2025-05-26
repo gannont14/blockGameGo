@@ -1,8 +1,8 @@
 package types
 
-import (
-	// . "github.com/gen2brain/raylib-go/raylib"
-)
+import "fmt"
+
+// . "github.com/gen2brain/raylib-go/raylib"
 
 type Item interface {
   GetId() int 
@@ -31,6 +31,7 @@ var nextItemId int = 0
 func GetNewItemID() int {
   ret := nextItemId
   nextItemId++
+	fmt.Println("Generated new item with id: ", ret)
   return ret
 }
 

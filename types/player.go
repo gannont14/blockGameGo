@@ -10,19 +10,21 @@ import (
 type Player struct{
   Id int;
   Pos Vector3;
+  World *World;
   Cam *Camera;
   Inventory *Inventory
   CanMoveCamera bool
   ActiveItemSlot int
 }
 
-func NewPlayer(startPos Vector3, c *Camera) Player{
+func NewPlayer(startPos Vector3, c *Camera, w *World) Player{
   // find the number of slots the player should have
   numInvSlots := constants.PlayerInventoryCols * constants.PlayerInventoryRows
   activeSlot := constants.PlayerInventoryCols * (constants.PlayerInventoryRows - 1)
   p := Player{
     Id: 0,
     Pos: startPos,
+		World: w,
     Cam: c,
     Inventory: NewInventory(numInvSlots, "PlayerInventory"),
     CanMoveCamera: true,
@@ -232,6 +234,7 @@ func (p *Player) PlaceBlock(ctx InteractionContext, b *BlockItem) bool {
 
   // block replacement code for now
   ctx.PotentialBlock.Type = b.Type
+  ctx.PotentialBlock.Color = b.Color
   ctx.PotentialBlock.Focused = true
 
   return true
@@ -240,7 +243,7 @@ func (p *Player) PlaceBlock(ctx InteractionContext, b *BlockItem) bool {
 func (p *Player) BreakBlock(info *BreakingInfo, bm *BreakingManager) {
   // copy so that we can do calculations after the block has been broken
   blockCopy := *info.TargetBlock 
-  airBlock := NewBlock(Air, info.TargetBlock.WorldPos, info.TargetBlock.BlockPosition)
+  airBlock := NewBlock(Air, info.TargetBlock.WorldPos, info.TargetBlock.BlockPosition, p.World)
   // replace block with air 
   info.TargetBlock.Replace(&airBlock)
 

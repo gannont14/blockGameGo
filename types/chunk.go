@@ -44,7 +44,7 @@ func GetChunksFromIndeces(idcs []ChunkIndex, w *World) []*Chunk{
   return c
 }
 
-func GenerateTestChunk(orig Vector3, row int, col int) Chunk{
+func GenerateTestChunk(orig Vector3, row int, col int, w *World) Chunk{
   var ch Chunk
   ch.Origin = orig
   // generate a test chunk with a layer of red blocks and the rest air
@@ -53,19 +53,22 @@ func GenerateTestChunk(orig Vector3, row int, col int) Chunk{
     for x := range constants.ChunkSizeX{
       for z := range constants.ChunkSizeZ{
 
-        b := NewBlock(
-          Air, 
-          Vector3Add(ch.Origin, blockOffset(x, y, z)),
-          NewBlockPosition(NewChunkIndex(col, row), NewBlockIndex(x, y, z)),
-          )
-
+				t := Air
         // hard code to be the floor
         if y == 0{
-          b.Type = RedBlock
+					t = RedBlock
         }
 				if x == 0 && y == 4 && z == 0 {
-          b.Type = BlueBlock
+					t = BlueBlock
 			}
+
+        b := NewBlock(
+          t, 
+          Vector3Add(ch.Origin, blockOffset(x, y, z)),
+          NewBlockPosition(NewChunkIndex(col, row), NewBlockIndex(x, y, z)),
+					w,
+          )
+
 
         // // hard code to test
         // if y == 1{
@@ -84,7 +87,7 @@ func GenerateTestChunk(orig Vector3, row int, col int) Chunk{
   return ch
 }
 
-func GenerateTestChunks(xChunks int, yChunks int) [][]Chunk{
+func GenerateTestChunks(xChunks int, yChunks int, w *World) [][]Chunk{
   c := make([][]Chunk, xChunks)
   for i := range xChunks{
     s := make([]Chunk, 0, yChunks)
@@ -92,7 +95,7 @@ func GenerateTestChunks(xChunks int, yChunks int) [][]Chunk{
       zOffset := ChunkTotalWidth() * float32(i)
       xOffset := ChunkTotalDepth() * float32(j)
       o := NewVector3(xOffset, 0.0, zOffset)
-      s = append(s, GenerateTestChunk(o, i, j))
+      s = append(s, GenerateTestChunk(o, i, j, w))
       fmt.Printf("Chunk [%d, %d] generated\nAt Origin [%f, %f, %f]\n",
         i, j, o.X, o.Y, o.Z)
     }

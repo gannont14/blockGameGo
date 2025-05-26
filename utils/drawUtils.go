@@ -65,13 +65,14 @@ func drawBlock(b types.Block){
   // find center point of block
   centerPoint := b.CenterPoint()
 
-  c := b.BlockColor()
-  if c != White{
+  
+  if b.Type != types.Air{
     DrawCube(centerPoint,
       constants.BlockWidth,
       constants.BlockHeight,
       constants.BlockDepth,
-      b.BlockColor())
+      b.Color,
+			)
     // Draw the bounding box to debug
     // DrawBoundingBox(b.BoundBox, Blue)
   }

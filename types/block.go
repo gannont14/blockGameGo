@@ -3,6 +3,7 @@ package types
 import (
 	"blockProject/constants"
 	"fmt"
+	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
 )
@@ -13,6 +14,9 @@ const (
   Air BlockType = iota
   RedBlock
   BlueBlock
+  GreenBlock
+  BrownBlock
+  BlackBlock
   //...
 )
 
@@ -22,6 +26,7 @@ type Block struct{
   BlockPosition BlockPosition
   Focused bool
   BoundBox BoundingBox
+	Color Color
 }
 
 type BlockIndex struct {
@@ -42,7 +47,7 @@ func (bi *BlockIndex) UnboxBlockIndex() (int, int, int) {
   return bi.I, bi.J, bi.K
 }
 
-func NewBlock(t BlockType, pos Vector3, bp BlockPosition) Block{
+func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World) Block{
   // generate bounding box min and max based on position vector
   bbMin := pos
   bbMax := Vector3Add(bbMin, 
@@ -50,10 +55,24 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition) Block{
       constants.BlockHeight, 
       constants.BlockDepth))
 
-  fmt.Printf("Box from [%f, %f, %f] to [%f, %f, %f]\n",
-    bbMin.X, bbMin.Y, bbMin.Z, 
-    bbMax.X, bbMax.Y, bbMax.Z, 
-    )
+  // fmt.Printf("Box from [%f, %f, %f] to [%f, %f, %f]\n",
+  //   bbMin.X, bbMin.Y, bbMin.Z, 
+  //   bbMax.X, bbMax.Y, bbMax.Z, 
+  //   )
+	// find from registry for the correct color
+	color := Blank
+	blockItem := w.ItemRegistry.GetBlockByItemType(t)
+
+	if blockItem == nil {
+		fmt.Println("block item not found of type: ", t)
+	} else {
+		if t != 0 {
+			fmt.Printf("block item found of type: %d\n", t)
+			color = blockItem.Color
+			fmt.Printf("Block type %d: Found color %v (R:%d G:%d B:%d A:%d)\n", 
+				t, blockItem.Name, color.R, color.G, color.B, color.A)
+		}
+	}
   // generate actual block struct
   b := Block{
     Type: t,
@@ -61,6 +80,7 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition) Block{
     BlockPosition: bp,
     Focused: false,
     BoundBox: NewBoundingBox(bbMin, bbMax),
+		Color: color,
   }
   return b
 }
@@ -69,6 +89,7 @@ func (old *Block) Replace (new *Block) {
   // replace all attributes
   old.Type          = new.Type
   old.Focused       = new.Focused
+  old.Color         = new.Color
   // other attributes that should be replaced in the future
 }
 
@@ -94,15 +115,6 @@ func (b *Block) IsReplaceable() bool {
 }
 
 func (b *Block) BlockColor() Color{
-  switch b.Type{
-  case Air:
-    return White
-  case RedBlock:
-    return Red
-  case BlueBlock:
-    return Blue
-  }
-
   // default
-  return White
+  return b.Color
 }

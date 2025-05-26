@@ -1,7 +1,7 @@
 package types
 
 import (
-	// . "github.com/gen2brain/raylib-go/raylib"
+	. "github.com/gen2brain/raylib-go/raylib"
 )
 
 type BlockHardness int 
@@ -21,6 +21,7 @@ type BlockItem struct{
 	PrefToolType ToolType
   BaseBreakTime float64 // base break time if it is possible to break with tool
   BlockHardness BlockHardness
+	Color Color
 }
 
 

@@ -39,16 +39,6 @@ func toggleInventoryStatus(){
   return
 }
 
-func RegisterAllItems(r *types.ItemRegistry) {
-  // there HAS to be a better way to do this
-  r.RegisterItem(items.NewRedBlockItem())
-  r.RegisterItem(items.NewBlueBlockItem())
-  r.RegisterItem(items.NewWoodenPickaxeItem())
-  r.RegisterItem(items.NewStonePickaxeItem())
-  r.RegisterItem(items.NewIronPickaxeItem())
-  r.RegisterItem(items.NewGoldPickaxeItem())
-  r.RegisterItem(items.NewDiamondPickaxeItem())
-}
 
 func initGame(){
 
@@ -60,40 +50,25 @@ func initGame(){
 	camera.Projection = CameraPerspective       // Camera projection type
   fmt.Println("Camera generated")
 
-  // generate player
-  player = types.NewPlayer(camera.Position, &camera)
-  fmt.Println("Player generated")
-
-  // generate the worlds test chunk
-  world.Chunks = types.GenerateTestChunks(constants.NumChunksX, constants.NumChunksY)
-  fmt.Println("Chunks generated")
-
   // generate the item registry 
   itemRegistry := types.NewItemRegistry()
   RegisterAllItems(itemRegistry)
 
   world.ItemRegistry = *itemRegistry
+  fmt.Println("ItemRegistry generated")
+
+  // generate player
+  player = types.NewPlayer(camera.Position, &camera, &world)
+  fmt.Println("Player generated")
+
+  // generate the worlds test chunk
+  world.Chunks = types.GenerateTestChunks(constants.NumChunksX, constants.NumChunksY, &world)
+  fmt.Println("Chunks generated")
+
   // create the block breaking manager
   breakingManager = *types.NewBreakingManager(world.ItemRegistry)
 
-  // add random items to the player inventory
-  redblock, _ := world.ItemRegistry.GetItemByID(0)
-  player.Inventory.AddItem(redblock, 63)
-  player.Inventory.AddItem(redblock, 3)
-
-  blueblock, _ := world.ItemRegistry.GetItemByID(1)
-  player.Inventory.AddItem(blueblock, 3)
-  player.Inventory.AddItem(blueblock, 3)
-  player.Inventory.AddItem(redblock, 3)
-  player.Inventory.AddItem(blueblock, 3) // Buggy
-
-  woodenPick, _ := world.ItemRegistry.GetItemByID(2)
-  player.Inventory.AddItem(woodenPick, 1)
-  player.Inventory.AddItem(woodenPick, 1)
-
-  stonePick, _ := world.ItemRegistry.GetItemByID(3)
-  player.Inventory.AddItem(stonePick, 1)
-
+	AddItemsToPlayerInv()
 }
 
 // all draw functions
@@ -202,4 +177,74 @@ func main() {
 
 		EndDrawing()
 	}
+}
+
+func AddItemsToPlayerInv(){
+  // add random items to the player inventory
+
+  Redblock, _ := world.ItemRegistry.GetItemByName("Red Block")
+  player.Inventory.AddItem(Redblock, 63)
+
+  Blueblock, _ := world.ItemRegistry.GetItemByName("Blue Block")
+  player.Inventory.AddItem(Blueblock, 63)
+
+  Brownblock, _ := world.ItemRegistry.GetItemByName("Brown Block")
+  player.Inventory.AddItem(Brownblock, 63)
+
+  Greenblock, _ := world.ItemRegistry.GetItemByName("Green Block")
+  player.Inventory.AddItem(Greenblock, 63)
+
+  Blackblock, _ := world.ItemRegistry.GetItemByName("Black Block")
+  player.Inventory.AddItem(Blackblock, 63)
+
+
+	// tools
+  WoodenPickaxe, _ := world.ItemRegistry.GetItemByName("Wooden Pickaxe")
+  player.Inventory.AddItem(WoodenPickaxe, 1)
+
+  WoodenShovel, _ := world.ItemRegistry.GetItemByName("Wooden Shovel")
+  player.Inventory.AddItem(WoodenShovel, 1)
+
+  WoodenAxe, _ := world.ItemRegistry.GetItemByName("Wooden Axe")
+  player.Inventory.AddItem(WoodenAxe, 1)
+
+  DiamondPickaxe, _ := world.ItemRegistry.GetItemByName("Diamond Pickaxe")
+  player.Inventory.AddItem(DiamondPickaxe, 1)
+
+  DiamondShovel, _ := world.ItemRegistry.GetItemByName("Diamond Shovel")
+  player.Inventory.AddItem(DiamondShovel, 1)
+
+  DiamondAxe, _ := world.ItemRegistry.GetItemByName("Diamond Axe")
+  player.Inventory.AddItem(DiamondAxe, 1)
+
+  GoldPickaxe, _ := world.ItemRegistry.GetItemByName("Gold Pickaxe")
+  player.Inventory.AddItem(GoldPickaxe, 1)
+}
+
+// Ew
+
+
+func RegisterAllItems(r *types.ItemRegistry) {
+  // there HAS to be a better way to do this
+  r.RegisterItem(items.NewAirBlockItem())
+  r.RegisterItem(items.NewRedBlockItem())
+  r.RegisterItem(items.NewBlueBlockItem())
+  r.RegisterItem(items.NewGreenBlockItem())
+  r.RegisterItem(items.NewBrownBlockItem())
+  r.RegisterItem(items.NewBlackBlockItem())
+  r.RegisterItem(items.NewWoodenPickaxeItem())
+  r.RegisterItem(items.NewStonePickaxeItem())
+  r.RegisterItem(items.NewIronPickaxeItem())
+  r.RegisterItem(items.NewGoldPickaxeItem())
+  r.RegisterItem(items.NewDiamondPickaxeItem())
+  r.RegisterItem(items.NewWoodenAxeItem())
+  r.RegisterItem(items.NewStoneAxeItem())
+  r.RegisterItem(items.NewIronAxeItem())
+  r.RegisterItem(items.NewGoldAxeItem())
+  r.RegisterItem(items.NewDiamondAxeItem())
+  r.RegisterItem(items.NewWoodenShovelItem())
+  r.RegisterItem(items.NewStoneShovelItem())
+  r.RegisterItem(items.NewIronShovelItem())
+  r.RegisterItem(items.NewGoldShovelItem())
+  r.RegisterItem(items.NewDiamondShovelItem())
 }
