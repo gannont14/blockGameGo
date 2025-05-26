@@ -4,23 +4,23 @@ import (
 
 )
 
-type BreakLevel int
+// DEPRECATED, Replaced with ToolLevel When i updated
+// type BreakLevel int
 
-const (
-  BreakLevelBase BreakLevel = iota // Base break level for all 
-  BreakLevelWood
-  BreakLevelStone
-  BreakLevelIron
-  BreakLevelGold
-  BreakLevelDiamond
-)
+// const (
+//   BreakLevelBase BreakLevel = iota // Base break level for all 
+//   BreakLevelWood
+//   BreakLevelStone
+//   BreakLevelIron
+//   BreakLevelGold
+//   BreakLevelDiamond
+// )
 
 type ToolItem struct{
   BaseItem
   Durability int 
   ToolType ToolType
   ToolLevel ToolLevel 
-  BreakLevel BreakLevel
   Speed float64 // could also be added to the tooltype type, type type type
 }
 
@@ -36,7 +36,7 @@ func (t *ToolItem) DegradeTool() {
   if t.Durability <= 0 {
     // nillify the item, going to just not let it break anything for now, could 
     // actually break it later, could also handle enchantments here
-    t.BreakLevel = -1 
+    t.ToolLevel = -1 
   }
 }
 

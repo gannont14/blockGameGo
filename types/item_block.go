@@ -45,14 +45,14 @@ func (b *BlockItem) Interact(ctx InteractionContext) bool {
 
 
 func (b *BlockItem) IsValidTool(item Item) bool{
-  breakLevel := BreakLevelBase
+  breakLevel := ToolLevelBase
   // check if it's even a tool
   tool, isTool := item.(*ToolItem)
 
   // if it's a tool, it could have a higher break level
   if isTool {
-    breakLevel = tool.BreakLevel
+    breakLevel = tool.ToolLevel
   }
 
-  return breakLevel >= BreakLevel(b.BlockHardness)
+  return breakLevel >= ToolLevel(b.BlockHardness)
 }
