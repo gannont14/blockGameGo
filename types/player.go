@@ -38,8 +38,8 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 	focusedBlockPosition **BlockPosition,
 	potentialBlock **Block,
   potentialBlockPosition **BlockPosition,
-  w *World,
   bm *BreakingManager) {
+	w := p.World
   // create ray of player in direciton
   playerLookRay := NewRay(
     p.Cam.Position,
@@ -125,7 +125,6 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 
     // handle the breaking
     p.handleBreaking(*focusedBlock,
-      w,
       bm)
 
 		// place the block
@@ -158,8 +157,8 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 
 func (p *Player) handleBreaking(
 	focusedBlock *Block, 
-	w *World, 
 	breakingManager *BreakingManager) {
+	w := p.World
 
 	// Check if left mouse button is held down
 	if IsMouseButtonDown(MouseButtonLeft) || IsKeyDown(KeyT) {

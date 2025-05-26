@@ -136,7 +136,6 @@ func updateGame(){
 		&focusedBlockPosition,
 		&potentialBlock,
 		&potentialBlockPosition,
-		&world,
     &breakingManager)
   // udpate what item the player is holding
   player.UpdatePlayerActiveItem()
