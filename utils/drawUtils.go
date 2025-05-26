@@ -8,6 +8,29 @@ import (
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
+func DrawProgressBar(pos Vector2,height int, width int, progress float32, bgColor Color, barColor Color){
+	startPos := NewVector2(pos.X - (float32(width) / 2.0), pos.Y)
+	endPos := NewVector2(pos.X + (float32(width) / 2.0), pos.Y)
+
+	// background
+	DrawLineEx(startPos, 
+		endPos,
+		float32(height),
+		bgColor)
+
+	// find what width should be 
+	progWidth := progress * float32(width)
+	pStartPos := NewVector2(pos.X - (float32(width) / 2.0), pos.Y)
+	pEndPos := NewVector2(pStartPos.X + progWidth, pos.Y)
+
+	// bar
+	DrawLineEx(pStartPos,
+		pEndPos,
+		float32(height),
+		barColor,
+		)
+}
+
 func DrawCrosshair() {
   // this is straight from claude, not going to lie
     // Get screen center

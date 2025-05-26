@@ -193,7 +193,8 @@ func (p *Player) handleBreaking(
 			// In progress
 			progress := breakingManager.GetProgress(p)
 			if constants.DEBUG {
-				DrawText(fmt.Sprintf("Breaking: %.1f%%", progress*100), 10, 190, 20, Red)
+				DrawText(fmt.Sprintf("Breaking: %.1f%%", progress*100), 10, 190, 20, Black)
+				
 			}
 
 		case BreakingResultNone:

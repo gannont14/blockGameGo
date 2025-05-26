@@ -137,6 +137,11 @@ func drawHud(){
 		// render FPS
     DrawDebugPlayerFPS()
   }
+
+	if breakingManager.IsPlayerBreaking(&player)  {
+		prog := breakingManager.GetProgress(&player)
+		DrawProgressBar(NewVector2(800, 500),10, 40, prog, Gray, Green)
+	}
 }
 
 func updateGame(){
