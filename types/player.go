@@ -326,14 +326,14 @@ func (p *Player) UpdatePlayerActiveItem(){
 
   // cycle keys pressed 
   if IsKeyPressed(KeyX) {
-    newSlot := (p.ActiveItemSlot + 1) % numSlots
+    newSlot := (p.ActiveItemSlot + 1) % numSlots + constants.HotbarOffset
     p.ActiveItemSlot = newSlot
   }
 
   // cycle keys pressed 
   if IsKeyPressed(KeyZ) {
     // need to add the num slots incase it goes negative
-    newSlot := (p.ActiveItemSlot - 1 + numSlots) % numSlots
+    newSlot := (p.ActiveItemSlot - 1 + numSlots) % numSlots + constants.HotbarOffset
     p.ActiveItemSlot = newSlot
   }
   // fmt.Println("Active player slot: ", p.ActiveItemSlot)
