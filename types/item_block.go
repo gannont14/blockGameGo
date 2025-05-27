@@ -2,6 +2,7 @@ package types
 
 import (
 	. "github.com/gen2brain/raylib-go/raylib"
+	textures "blockProject/textures"
 )
 
 type BlockHardness int 
@@ -22,6 +23,7 @@ type BlockItem struct{
   BaseBreakTime float64 // base break time if it is possible to break with tool
   BlockHardness BlockHardness
 	Color Color
+	AtlasPosition textures.TextureAtlasPosition
 }
 
 

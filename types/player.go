@@ -226,15 +226,12 @@ func (p *Player) PlaceBlock(ctx InteractionContext, b *BlockItem) bool {
 
   if !val { return false }
 
+	newBlock := NewBlock(b.Type,
+		ctx.PotentialBlock.WorldPos,
+		ctx.PotentialBlock.BlockPosition,
+		ctx.World)
 
-  // now actually place the block and handle inventory
-  // ctx.World.PlaceBlockAtBlockPosition(activeItem,
-  //   &ctx.PotentialBlock.BlockPosition)
-
-  // block replacement code for now
-  ctx.PotentialBlock.Type = b.Type
-  ctx.PotentialBlock.Color = b.Color
-  ctx.PotentialBlock.Focused = true
+	ctx.PotentialBlock.Replace(&newBlock)
 
   return true
 }

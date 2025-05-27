@@ -2,6 +2,7 @@ package types
 
 import (
 	constants "blockProject/constants"
+	"blockProject/textures"
 	"fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
@@ -11,6 +12,7 @@ import (
 type World struct{
   Chunks [][]Chunk
   ItemRegistry ItemRegistry
+	TextureAtlas *textures.TextureAtlas
 }
 
 type BlockPosition struct{

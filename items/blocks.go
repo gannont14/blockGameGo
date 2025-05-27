@@ -1,7 +1,9 @@
 package items
 
 import (
+	"blockProject/textures"
 	"blockProject/types"
+
 	. "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -16,7 +18,7 @@ import (
 func NewAirBlockItem() *types.BlockItem {
   return &types.BlockItem{
     BaseItem: types.BaseItem{
-      Id: types.GetNewItemID(), // will this work without static?
+      Id: types.GetNewItemID(), 
       Name: "Air Block",
       MaxStackSize: -1,
     },
@@ -25,6 +27,7 @@ func NewAirBlockItem() *types.BlockItem {
     BaseBreakTime: -1,
     BlockHardness: types.BaseLevel,
     Color: Blank,
+		AtlasPosition: textures.TextureAtlasPosition{},
   }
 }
 
@@ -32,7 +35,7 @@ func NewAirBlockItem() *types.BlockItem {
 func NewRedBlockItem() *types.BlockItem {
   return &types.BlockItem{
     BaseItem: types.BaseItem{
-      Id: types.GetNewItemID(), // will this work without static?
+      Id: types.GetNewItemID(), 
       Name: "Red Block",
       MaxStackSize: 64,
     },
@@ -41,6 +44,7 @@ func NewRedBlockItem() *types.BlockItem {
     BaseBreakTime: 3.0,
     BlockHardness: types.BaseLevel,
     Color: Red,
+		AtlasPosition: textures.NewTextureAtlasPosition(0, 0),
   }
 }
 
@@ -57,6 +61,7 @@ func NewBlueBlockItem() *types.BlockItem {
     BaseBreakTime: 3.0,
     BlockHardness: types.BaseLevel,
 		Color: Blue,
+		AtlasPosition: textures.NewTextureAtlasPosition(0, 1),
   }
 }
 
@@ -72,6 +77,7 @@ func NewGreenBlockItem() *types.BlockItem {
 		BaseBreakTime: 3.0,
 		BlockHardness: types.BaseLevel,
 		Color: Green,
+		AtlasPosition: textures.NewTextureAtlasPosition(0, 2),
 	}
 }
 
@@ -88,6 +94,7 @@ func NewBrownBlockItem() *types.BlockItem {
 		BaseBreakTime: 3.0,
 		BlockHardness: types.BaseLevel,
 		Color: Brown,
+		AtlasPosition: textures.NewTextureAtlasPosition(0, 3),
 	}
 }
 
@@ -104,5 +111,6 @@ func NewBlackBlockItem() *types.BlockItem {
 		BaseBreakTime: 3.0,
 		BlockHardness: types.GoldLevel,
 		Color: Black,
+		AtlasPosition: textures.NewTextureAtlasPosition(1, 0),
 	}
 }

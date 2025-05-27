@@ -2,7 +2,7 @@ package types
 
 import (
 	"blockProject/constants"
-	"fmt"
+	// "fmt"
 	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
@@ -26,6 +26,7 @@ type Block struct{
   BlockPosition BlockPosition
   Focused bool
   BoundBox BoundingBox
+	BlockItem *BlockItem
 	Color Color
 }
 
@@ -47,7 +48,7 @@ func (bi *BlockIndex) UnboxBlockIndex() (int, int, int) {
   return bi.I, bi.J, bi.K
 }
 
-func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World) Block{
+func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World, ) Block{
   // generate bounding box min and max based on position vector
   bbMin := pos
   bbMax := Vector3Add(bbMin, 
@@ -64,13 +65,13 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World) Block{
 	blockItem := w.ItemRegistry.GetBlockByItemType(t)
 
 	if blockItem == nil {
-		fmt.Println("block item not found of type: ", t)
+		// fmt.Println("block item not found of type: ", t)
 	} else {
 		if t != 0 {
-			fmt.Printf("block item found of type: %d\n", t)
+			// fmt.Printf("block item found of type: %d\n", t)
 			color = blockItem.Color
-			fmt.Printf("Block type %d: Found color %v (R:%d G:%d B:%d A:%d)\n", 
-				t, blockItem.Name, color.R, color.G, color.B, color.A)
+			// fmt.Printf("Block type %d: Found color %v (R:%d G:%d B:%d A:%d)\n", 
+				// t, blockItem.Name, color.R, color.G, color.B, color.A)
 		}
 	}
   // generate actual block struct
@@ -81,6 +82,7 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World) Block{
     Focused: false,
     BoundBox: NewBoundingBox(bbMin, bbMax),
 		Color: color,
+		BlockItem: blockItem,
   }
   return b
 }
@@ -90,6 +92,7 @@ func (old *Block) Replace (new *Block) {
   old.Type          = new.Type
   old.Focused       = new.Focused
   old.Color         = new.Color
+	old.BlockItem     = new.BlockItem
   // other attributes that should be replaced in the future
 }
 
