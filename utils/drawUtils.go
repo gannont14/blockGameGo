@@ -2,6 +2,7 @@ package utils
 
 import (
 	"blockProject/constants"
+	"blockProject/textures"
 	types "blockProject/types"
 	"fmt"
 
@@ -61,18 +62,32 @@ func DrawCrosshair() {
     )
 }
 
-func drawBlock(b types.Block){
+func drawBlock(b types.Block, ta *textures.TextureAtlas){
   // find center point of block
   centerPoint := b.CenterPoint()
 
-  
   if b.Type != types.Air{
-    DrawCube(centerPoint,
-      constants.BlockWidth,
-      constants.BlockHeight,
-      constants.BlockDepth,
-      b.Color,
+
+		// nilPos := textures.TextureAtlasPosition{}
+		// if b.BlockItem.AtlasPosition ==  nilPos {
+			// fallback
+		// 	DrawCube(centerPoint,
+		// 		constants.BlockWidth,
+		// 		constants.BlockHeight,
+		// 		constants.BlockDepth,
+		// 		b.Color,
+		// 		)
+		// }
+
+		// draw the textured cube
+		drawTexturedCube(centerPoint,
+			constants.BlockWidth,
+			constants.BlockHeight,
+			constants.BlockDepth,
+			&b,
+			ta,
 			)
+		
     // Draw the bounding box to debug
     // DrawBoundingBox(b.BoundBox, Blue)
   }
@@ -86,7 +101,64 @@ func drawBlock(b types.Block){
   }
 }
 
-func drawChunk(c types.Chunk){
+func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block, ta *textures.TextureAtlas) {
+	row, col := b.BlockItem.AtlasPosition.Val()
+	blockTexture := textures.NewBlockTexture(ta, row, col)
+
+	// half of each
+  hs_w := width / 2
+  hs_h := height / 2  
+  hs_d := depth / 2
+
+  // Define vertices of cube
+  v000 := Vector3{X: pos.X - hs_w, Y: pos.Y - hs_h, Z: pos.Z - hs_d}
+  v001 := Vector3{X: pos.X - hs_w, Y: pos.Y - hs_h, Z: pos.Z + hs_d}
+  v010 := Vector3{X: pos.X - hs_w, Y: pos.Y + hs_h, Z: pos.Z - hs_d}
+  v011 := Vector3{X: pos.X - hs_w, Y: pos.Y + hs_h, Z: pos.Z + hs_d}
+  v100 := Vector3{X: pos.X + hs_w, Y: pos.Y - hs_h, Z: pos.Z - hs_d}
+  v101 := Vector3{X: pos.X + hs_w, Y: pos.Y - hs_h, Z: pos.Z + hs_d}
+  v110 := Vector3{X: pos.X + hs_w, Y: pos.Y + hs_h, Z: pos.Z - hs_d}
+  v111 := Vector3{X: pos.X + hs_w, Y: pos.Y + hs_h, Z: pos.Z + hs_d}
+
+	// Helper to draw a face with texture coordinates
+	drawFace := func(a, b, c, d Vector3, coords [4]Vector2) {
+		Begin(Quads)
+		SetTexture(blockTexture.Atlas.Texture.ID)
+
+		// Set vertex color to white to ensure full texture brightness
+		Color4ub(255, 255, 255, 255)
+		TexCoord2f(coords[0].X, coords[0].Y)
+		Vertex3f(a.X, a.Y, a.Z)
+
+		Color4ub(255, 255, 255, 255)
+		TexCoord2f(coords[1].X, coords[1].Y)
+		Vertex3f(b.X, b.Y, b.Z)
+
+		Color4ub(255, 255, 255, 255)
+		TexCoord2f(coords[2].X, coords[2].Y)
+		Vertex3f(c.X, c.Y, c.Z)
+
+		Color4ub(255, 255, 255, 255)
+		TexCoord2f(coords[3].X, coords[3].Y)
+		Vertex3f(d.X, d.Y, d.Z)
+
+		End()
+	}
+
+  // Get the BlockTextureMap from the BlockTexture
+  textureMap := blockTexture.BlockTexturemap
+
+  // Draw each face with corresponding texture coordinates
+  drawFace(v011, v111, v110, v010, textureMap["top"])    // Top face (Y+)
+  drawFace(v000, v100, v101, v001, textureMap["bottom"]) // Bottom face (Y-)
+  drawFace(v001, v101, v111, v011, textureMap["front"])  // Front face (Z+)
+  drawFace(v100, v000, v010, v110, textureMap["back"])   // Back face (Z-)
+  drawFace(v000, v001, v011, v010, textureMap["left"])   // Left face (X-)
+  drawFace(v101, v100, v110, v111, textureMap["right"])  // Right face (X+)
+
+}
+
+func drawChunk(c types.Chunk, w *types.World){
   if(len(c.Blocks)) == 0{
     return 
   }
@@ -95,7 +167,7 @@ func drawChunk(c types.Chunk){
     for j := range(len(c.Blocks[0])){
       for k := range(len(c.Blocks[0][0])){
         b := c.Blocks[i][j][k]
-        drawBlock(b)
+        drawBlock(b, w.TextureAtlas)
         count += 1
       }
     }
@@ -120,7 +192,7 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
   for _, val := range idcs{
     j, i := val.UnboxChunkIndex()
     c := w.Chunks[i][j]
-    drawChunk(c)
+    drawChunk(c, &w)
   }
 }
 

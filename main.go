@@ -7,6 +7,7 @@ import (
 	"fmt"
 	. "github.com/gen2brain/raylib-go/raylib"
   items "blockProject/items"
+	"blockProject/textures"
 )
 
 var camera Camera3D
@@ -15,6 +16,7 @@ var world types.World
 var renderedChunkIndeces []types.ChunkIndex
 var renderedChunks []*types.Chunk
 var breakingManager types.BreakingManager
+var textureAtlas textures.TextureAtlas
 
 var focusedBlock *types.Block = nil
 var focusedBlockPosition *types.BlockPosition = nil
@@ -41,6 +43,13 @@ func toggleInventoryStatus(){
 
 
 func initGame(){
+
+	// create the texture atlas 
+	textureAtlas = textures.NewTextureAtlas("textures/atlases/block_atlas.png", 
+		5, 1, 16)
+
+	// add to world
+	world.TextureAtlas = &textureAtlas
 
   // init the camera
 	camera.Position = NewVector3(0.0, constants.PlayerHeight, 4.0) // Camera position
@@ -74,8 +83,7 @@ func initGame(){
 // all draw functions
 func drawGame(){
   // draw the chunks
-  DrawChunks(world, player,
-		renderedChunkIndeces)
+  DrawChunks(world, player, renderedChunkIndeces)
 
 	// active block marker
 	if potentialBlock != nil{
