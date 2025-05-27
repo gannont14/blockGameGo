@@ -45,7 +45,7 @@ func toggleInventoryStatus(){
 func initGame(){
 
 	// create the texture atlas 
-	textureAtlas = textures.NewTextureAtlas("textures/atlases/block_atlas.png", 
+	textureAtlas = textures.NewTextureAtlas("textures/atlases/block_atlas2.png", 
 		5, 1, 16)
 
 	// add to world

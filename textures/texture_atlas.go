@@ -86,8 +86,8 @@ func (ta *TextureAtlas) RetrieveBlockTextureMap (orig Vector2) BlockTextureMap {
 		return [4]Vector2{
 			{X: u, Y: v},           // Top left
 			{X: u + uW, Y: v},      // Top right
-			{X: u, Y: v + vH},      // Bottom left
 			{X: u + uW, Y: v + vH}, // Bottom right
+			{X: u, Y: v + vH},      // Bottom left
 		}
 	}
 

@@ -18,7 +18,7 @@ import (
 func NewAirBlockItem() *types.BlockItem {
   return &types.BlockItem{
     BaseItem: types.BaseItem{
-      Id: types.GetNewItemID(), // will this work without static?
+      Id: types.GetNewItemID(), 
       Name: "Air Block",
       MaxStackSize: -1,
     },
@@ -35,7 +35,7 @@ func NewAirBlockItem() *types.BlockItem {
 func NewRedBlockItem() *types.BlockItem {
   return &types.BlockItem{
     BaseItem: types.BaseItem{
-      Id: types.GetNewItemID(), // will this work without static?
+      Id: types.GetNewItemID(), 
       Name: "Red Block",
       MaxStackSize: 64,
     },
@@ -111,6 +111,6 @@ func NewBlackBlockItem() *types.BlockItem {
 		BaseBreakTime: 3.0,
 		BlockHardness: types.GoldLevel,
 		Color: Black,
-		AtlasPosition: textures.NewTextureAtlasPosition(0, 4),
+		AtlasPosition: textures.NewTextureAtlasPosition(1, 0),
 	}
 }

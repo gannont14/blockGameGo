@@ -48,7 +48,7 @@ func (bi *BlockIndex) UnboxBlockIndex() (int, int, int) {
   return bi.I, bi.J, bi.K
 }
 
-func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World) Block{
+func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World, ) Block{
   // generate bounding box min and max based on position vector
   bbMin := pos
   bbMax := Vector3Add(bbMin, 
@@ -92,6 +92,7 @@ func (old *Block) Replace (new *Block) {
   old.Type          = new.Type
   old.Focused       = new.Focused
   old.Color         = new.Color
+	old.BlockItem     = new.BlockItem
   // other attributes that should be replaced in the future
 }
 
