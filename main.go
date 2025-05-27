@@ -10,13 +10,16 @@ import (
 	"blockProject/textures"
 )
 
+var targetFPS int32 = 120
+
 var camera Camera3D
 var player types.Player
 var world types.World
 var renderedChunkIndeces []types.ChunkIndex
 var renderedChunks []*types.Chunk
 var breakingManager types.BreakingManager
-var textureAtlas textures.TextureAtlas
+var textureAtlas textures.BlockAtlas
+var itemAtlas textures.ItemAtlas
 
 var focusedBlock *types.Block = nil
 var focusedBlockPosition *types.BlockPosition = nil
@@ -48,8 +51,12 @@ func initGame(){
 	textureAtlas = textures.NewTextureAtlas("textures/atlases/block_atlas2.png", 
 		5, 1, 16)
 
+	// create the  item atlas
+	itemAtlas = textures.NewItemAtlas("textures/atlases/item_atlas.png",
+		5, 2, 16)
+
 	// add to world
-	world.TextureAtlas = &textureAtlas
+	world.BlockAtlas = &textureAtlas
 
   // init the camera
 	camera.Position = NewVector3(0.0, constants.PlayerHeight, 4.0) // Camera position
@@ -99,11 +106,11 @@ func drawHud(){
   DrawCrosshair()
 
   if hotbarDisplayed {
-    DrawHotbar(*player.Inventory, player.ActiveItemSlot)
+    DrawHotbar(*player.Inventory, player.ActiveItemSlot, &itemAtlas)
   }
 
   if inventoryDisplayed {
-    DrawInventory(player.Inventory)
+    DrawInventory(player.Inventory, &itemAtlas)
     // fmt.Println("Displaying inventory")
   }
 
@@ -155,7 +162,7 @@ func main() {
 	InitWindow(1600, 900, "raylib [core] example - basic window")
 	defer CloseWindow()
 
-	SetTargetFPS(60)
+	SetTargetFPS(500)
   DisableCursor()
 
   initGame()

@@ -5,6 +5,6 @@ const (
   ChunkSizeY = 8
   ChunkSizeZ = 8
 
-  NumChunksX = 1
-  NumChunksY = 1
+  NumChunksX = 15
+  NumChunksY = 15
 )

@@ -26,6 +26,10 @@ type BlockItem struct{
 	AtlasPosition textures.TextureAtlasPosition
 }
 
+func (b *BlockItem) GetAtlasPosition() textures.TextureAtlasPosition {
+	return b.BaseItem.AtlasPosition
+}
+
 
 func (b *BlockItem) Interact(ctx InteractionContext) bool {
   switch ctx.InteractionType{

@@ -17,4 +17,7 @@ const (
 
   // Block breaking information
   DefaultBreakTime = 3.0
+
+	// item related consts, could be own file
+	DefaultSharpness = 2.0
 )

@@ -1,20 +1,7 @@
 package types
 
-import (
+import "blockProject/textures"
 
-)
-
-// DEPRECATED, Replaced with ToolLevel When i updated
-// type BreakLevel int
-
-// const (
-//   BreakLevelBase BreakLevel = iota // Base break level for all 
-//   BreakLevelWood
-//   BreakLevelStone
-//   BreakLevelIron
-//   BreakLevelGold
-//   BreakLevelDiamond
-// )
 
 type ToolItem struct{
   BaseItem
@@ -22,6 +9,11 @@ type ToolItem struct{
   ToolType ToolType
   ToolLevel ToolLevel 
   Speed float64 // could also be added to the tooltype type, type type type
+	Sharpness float64
+}
+
+func (t *ToolItem) GetAtlasPosition() textures.TextureAtlasPosition {
+	return t.BaseItem.AtlasPosition
 }
 
 func (t *ToolItem) Interact(ctx InteractionContext) bool {

@@ -4,7 +4,7 @@ import (
 	"blockProject/constants"
 	"blockProject/textures"
 	types "blockProject/types"
-	"fmt"
+	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
 )
@@ -62,7 +62,7 @@ func DrawCrosshair() {
     )
 }
 
-func drawBlock(b types.Block, ta *textures.TextureAtlas){
+func drawBlock(b types.Block, ta *textures.BlockAtlas){
   // find center point of block
   centerPoint := b.CenterPoint()
 
@@ -101,7 +101,7 @@ func drawBlock(b types.Block, ta *textures.TextureAtlas){
   }
 }
 
-func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block, ta *textures.TextureAtlas) {
+func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block, ta *textures.BlockAtlas) {
 	row, col := b.BlockItem.AtlasPosition.Val()
 	blockTexture := textures.NewBlockTexture(ta, row, col)
 
@@ -167,7 +167,7 @@ func drawChunk(c types.Chunk, w *types.World){
     for j := range(len(c.Blocks[0])){
       for k := range(len(c.Blocks[0][0])){
         b := c.Blocks[i][j][k]
-        drawBlock(b, w.TextureAtlas)
+        drawBlock(b, w.BlockAtlas)
         count += 1
       }
     }
@@ -202,7 +202,7 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
     different widths of the hotbar, as well as number of items
 
 */
-func DrawHotbar(inv types.Inventory, activeItemSlot int) {
+func DrawHotbar(inv types.Inventory, activeItemSlot int, ia *textures.ItemAtlas) {
   // calculate the required values, such as height, which 
   // would update the slots height and width
 
@@ -232,10 +232,10 @@ func DrawHotbar(inv types.Inventory, activeItemSlot int) {
     )
 
   // now draw the slots
-  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY), activeItemSlot)
+  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY), activeItemSlot, ia)
 }
 
-func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int, activeSlot int) {
+func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int, activeSlot int, ia *textures.ItemAtlas) {
   // should be able to take variable amount of items,
   // and display the user's hot bar items
   yOffset := constants.HUDHotbarSlotMargin
@@ -250,7 +250,7 @@ func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int
     }
 
     DrawItemSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray, hasBorder)
-    drawItemStack(NewVector2(float32(origX + xOffset), float32(origY + yOffset)),  slots[i], 12)
+    drawItemStack(NewVector2(float32(origX + xOffset), float32(origY + yOffset)),  slots[i], 12, ia)
   }
 }
 
@@ -274,7 +274,7 @@ func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color, hasB
   }
 }
 
-func DrawInventory(inv *types.Inventory){
+func DrawInventory(inv *types.Inventory, ia *textures.ItemAtlas){
   // divider between inventory and hotbar items
   dividerHeight := constants.PlayerInventorySlotMargin * 3.0
   // total margin space on y axis (numRows + 1)
@@ -301,10 +301,10 @@ func DrawInventory(inv *types.Inventory){
     White)
 
   // Draw the individual slots
-  DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight))
+  DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight), ia)
 }
 
-func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int){
+func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int, ia *textures.ItemAtlas){
   items := inv.Slots
 
   // figure out which slot the user is hovering over
@@ -328,7 +328,7 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
     }
 
     DrawItemSlot(items[i], origVec, slotSize, col, false)
-    drawItemStack(origVec, items[i], slotSize)
+    drawItemStack(origVec, items[i], slotSize, ia)
     // on click handler
   }
 
@@ -339,23 +339,32 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
     inv.HandleItemClick(activeSlot)
   }
   // PrintPlayerHand(inv)
-  drawItemStack(GetMousePosition(), inv.Hand, 12)
+  drawItemStack(GetMousePosition(), inv.Hand, 50, ia)
 }
 
 // will always be square so the size can just be one value
-func drawItemStack(pos Vector2, is types.ItemStack, size int){
+func drawItemStack(pos Vector2, is types.ItemStack, size int, ia *textures.ItemAtlas){
   if is.Item == nil{
     return
   }
   // for now will draw the item ID and then the count
-  itemName := fmt.Sprint(is.Item.GetName())
-  itemCount := fmt.Sprint(is.Count)
+  // itemName := fmt.Sprint(is.Item.GetName())
+  // itemCount := fmt.Sprint(is.Count)
+
+	rec := ia.GetRectanglePos(is.Item.GetAtlasPosition())
+	drawScaledRectangle(rec, pos, float32(size), ia)
 
   // Draw the item's ID in the center
-  DrawText(itemName, int32(pos.X), int32(pos.Y), 12, Blue)
+  // DrawText(itemName, int32(pos.X), int32(pos.Y), 12, Blue)
 
   // Daw the item's count
-  DrawText(itemCount, int32(pos.X), int32(pos.Y), 25, Red)
+  // DrawText(itemCount, int32(pos.X), int32(pos.Y), 25, Red)
+}
+
+func drawScaledRectangle(tileRec Rectangle, pos Vector2, size float32, ia *textures.ItemAtlas) {
+	scaledRec := NewRectangle(pos.X, pos.Y, float32(size), float32(size))
+
+	DrawTexturePro(ia.Texture, tileRec, scaledRec, NewVector2(0, 0), 0.0, White)
 }
 
 

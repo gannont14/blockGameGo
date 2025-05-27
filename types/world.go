@@ -12,7 +12,7 @@ import (
 type World struct{
   Chunks [][]Chunk
   ItemRegistry ItemRegistry
-	TextureAtlas *textures.TextureAtlas
+	BlockAtlas *textures.BlockAtlas
 }
 
 type BlockPosition struct{

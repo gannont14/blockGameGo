@@ -5,14 +5,14 @@ import (
 )
 
 type BlockTexture struct {
-	Atlas *TextureAtlas
+	Atlas *BlockAtlas
 	Orig Vector2
 	BlockTexturemap BlockTextureMap
 }
 
 type BlockTextureMap map[string][4]Vector2 // stores the coords for each of the faces in the atlas
 
-func NewBlockTexture(atlas *TextureAtlas, row, col int) BlockTexture {
+func NewBlockTexture(atlas *BlockAtlas, row, col int) BlockTexture {
 	// find out row and col
 	orig := atlas.GetTextureAtlasOrig(NewTextureAtlasPosition(row, col))
 

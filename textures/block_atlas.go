@@ -22,7 +22,7 @@ func (tap *TextureAtlasPosition) Val() (int, int){
 	return tap.Row, tap.Col
 }
 
-type TextureAtlas struct {
+type BlockAtlas struct {
 	FilePath   string
 	NumBlocksX int
 	NumBlocksY int
@@ -30,7 +30,7 @@ type TextureAtlas struct {
 	Texture Texture2D
 }
 
-func NewTextureAtlas(filePath string, numBlocksX, numBlocksY, blockSize int) TextureAtlas {
+func NewTextureAtlas(filePath string, numBlocksX, numBlocksY, blockSize int) BlockAtlas {
 	// create the texture object 
 	tex := LoadTexture(filePath)
 	fmt.Print("Loaded Texture")
@@ -39,7 +39,7 @@ func NewTextureAtlas(filePath string, numBlocksX, numBlocksY, blockSize int) Tex
 	fmt.Printf("Texture Height: %d\n", tex.Height)
 	fmt.Printf("Texture Format: %d\n", tex.Format)
 
-	atlas := TextureAtlas{
+	atlas := BlockAtlas{
 		FilePath: filePath,
 		NumBlocksX: numBlocksX,
 		NumBlocksY: numBlocksY,
@@ -50,7 +50,7 @@ func NewTextureAtlas(filePath string, numBlocksX, numBlocksY, blockSize int) Tex
 	return atlas
 }
 
-func (ta *TextureAtlas) GetTextureAtlasOrig(atlasPos TextureAtlasPosition) Vector2{
+func (ta *BlockAtlas) GetTextureAtlasOrig(atlasPos TextureAtlasPosition) Vector2{
 	// find how much X a block takes up
 	bw := ta.BlockSize * 3 // 3 faces horizontally
 	// find how much Y a block takes up
@@ -67,7 +67,7 @@ func (ta *TextureAtlas) GetTextureAtlasOrig(atlasPos TextureAtlasPosition) Vecto
 	Gets the coords for each corner of each face for a given origin in the atlas
 */
 
-func (ta *TextureAtlas) RetrieveBlockTextureMap (orig Vector2) BlockTextureMap {
+func (ta *BlockAtlas) RetrieveBlockTextureMap (orig Vector2) BlockTextureMap {
 	// takes in row, col to get corner points
 	getTexCoords := func(x, y int) [4]Vector2 {
 		w := float32(ta.BlockSize)
