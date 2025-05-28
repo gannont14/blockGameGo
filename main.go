@@ -3,36 +3,34 @@ package main
 import (
 	"blockProject/constants"
 	gamestate "blockProject/gamestate"
+	items "blockProject/items"
+	"blockProject/textures"
 	types "blockProject/types"
 	. "blockProject/utils"
 	"fmt"
 	. "github.com/gen2brain/raylib-go/raylib"
-	items "blockProject/items"
-	"blockProject/textures"
 )
-
 
 var (
 	targetFPS int32 = 120
 
-	camera Camera3D
+	camera               Camera3D
 	renderedChunkIndeces []types.ChunkIndex
-	renderedChunks []*types.Chunk
+	renderedChunks       []*types.Chunk
 
 	gs *gamestate.GameState
 
-	focusedBlock *types.Block = nil
-	focusedBlockPosition *types.BlockPosition = nil
-	potentialBlock *types.Block = nil
+	focusedBlock           *types.Block         = nil
+	focusedBlockPosition   *types.BlockPosition = nil
+	potentialBlock         *types.Block         = nil
 	potentialBlockPosition *types.BlockPosition = nil
-	inventoryDisplayed bool = false
-	hotbarDisplayed bool = true
-
+	inventoryDisplayed     bool                 = false
+	hotbarDisplayed        bool                 = true
 )
 
-func toggleInventoryStatus(){
-	player := gs.Player 
-	
+func toggleInventoryStatus() {
+	player := gs.Player
+
 	if inventoryDisplayed {
 		DisableCursor()
 		player.CanMoveCamera = true
@@ -48,9 +46,9 @@ func toggleInventoryStatus(){
 	return
 }
 
-func initGame(){
-	// create the texture atlas 
-	blockAtlas := textures.NewTextureAtlas("textures/atlases/block_atlas2.png", 
+func initGame() {
+	// create the texture atlas
+	blockAtlas := textures.NewTextureAtlas("textures/atlases/block_atlas2.png",
 		5, 1, 16)
 
 	// create the item atlas
@@ -65,7 +63,7 @@ func initGame(){
 	camera.Projection = CameraPerspective
 	fmt.Println("Camera generated")
 
-	// generate the item registry 
+	// generate the item registry
 	itemRegistry := types.NewItemRegistry()
 	RegisterAllItems(itemRegistry)
 	fmt.Println("ItemRegistry generated")
@@ -96,12 +94,12 @@ func initGame(){
 }
 
 // all draw functions
-func drawGame(){
+func drawGame() {
 	// draw the chunks
 	DrawChunks(renderedChunkIndeces)
 
 	// active block marker
-	if potentialBlock != nil{
+	if potentialBlock != nil {
 		DrawSphere(potentialBlock.CenterPoint(),
 			0.2,
 			Orange)
@@ -109,22 +107,24 @@ func drawGame(){
 	//...
 }
 
-func drawHud(){
+func drawHud() {
 	// Access from gamestate
 	player := gs.Player
 	breakingManager := gs.BreakingManager
-	
-	// draw crosshair
-	DrawCrosshair()
-
-	if hotbarDisplayed {
-		DrawHotbar(*player.Inventory, player.ActiveItemSlot)
-	}
 
 	if inventoryDisplayed {
 		// fmt.Println("Displaying inventory")
 		DrawInventory(*&player.Inventory)
 	}
+	if hotbarDisplayed {
+		DrawHotbar(*player.Inventory, player.ActiveItemSlot)
+	}
+	// draw crosshair
+	DrawCrosshair()
+
+	// draw item name
+	itemNameOrig := Vector2{X: constants.ScreenWidth / 2 , Y: constants.ScreenHeight - 125}
+	DrawItemName(itemNameOrig, 30)
 
 	// debug menu
 	if constants.DEBUG {
@@ -137,18 +137,18 @@ func drawHud(){
 
 	if breakingManager.IsPlayerBreaking(player) {
 		prog := breakingManager.GetProgress(player)
-		DrawProgressBar(NewVector2(800, 500),10, 40, prog, Gray, Green)
+		DrawProgressBar(NewVector2(800, 500), 10, 40, prog, Gray, Green)
 	}
 }
 
-func updateGame(){
+func updateGame() {
 	player := gs.Player
 	world := gs.World
 	breakingManager := gs.BreakingManager
-	
+
 	// update the players positions
 	pos := NewVector3(camera.Position.X,
-		camera.Position.Y - (constants.PlayerHeight / 2),
+		camera.Position.Y-(constants.PlayerHeight/2),
 		camera.Position.Z)
 	player.Pos = pos
 
@@ -157,20 +157,20 @@ func updateGame(){
 	renderedChunks = types.GetChunksFromIndeces(renderedChunkIndeces, world)
 
 	// find the active block that the player is looking at
-	player.GenerateActiveBlock(renderedChunks, 
+	player.GenerateActiveBlock(renderedChunks,
 		&focusedBlock,
 		&focusedBlockPosition,
 		&potentialBlock,
 		&potentialBlockPosition,
 		breakingManager)
-	
+
 	// update what item the player is holding
 	player.UpdatePlayerActiveItem()
 	//...
 }
 
 func main() {
-	InitWindow(1600, 900, "raylib [core] example - basic window")
+	InitWindow(constants.ScreenWidth, constants.ScreenHeight, "raylib [core] example - basic window")
 	defer CloseWindow()
 
 	SetTargetFPS(500)
@@ -180,10 +180,10 @@ func main() {
 
 	for !WindowShouldClose() {
 		player := gs.Player // Access player from gamestate
-		
+
 		player.UpdatePlayerCamera(&camera)
 
-		if(IsKeyPressed(KeyE)){
+		if IsKeyPressed(KeyE) {
 			toggleInventoryStatus()
 		}
 
@@ -201,11 +201,11 @@ func main() {
 	}
 }
 
-func AddItemsToPlayerInv(){
+func AddItemsToPlayerInv() {
 	// Access from gamestate
 	player := gs.Player
 	world := gs.World
-	
+
 	// add random items to the player inventory
 	Redblock, _ := world.ItemRegistry.GetItemByName("Red Block")
 	player.Inventory.AddItem(Redblock, 63)

@@ -2,9 +2,11 @@ package utils
 
 import (
 	"blockProject/constants"
-	"blockProject/textures"
 	gamestate "blockProject/gamestate"
+	"blockProject/textures"
 	types "blockProject/types"
+	"fmt"
+
 	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
@@ -13,6 +15,26 @@ import (
 var (
 	gs *gamestate.GameState
 )
+
+func DrawItemName(pos Vector2, fontSize int) {
+	p := gamestate.Get().Player
+	activeItem, _ := p.GetActiveItem()
+
+	// nothign in hand
+	if activeItem == nil {
+		return 
+	}
+
+	// grab the name of the active item
+	name := activeItem.GetName()
+	textWidth := MeasureText(name, int32(fontSize))
+	centeredX := int32(pos.X - (float32(textWidth) / 2))
+
+	// draw 'background' text, where it's black
+	DrawText(fmt.Sprintf("%s", name), centeredX - 1, int32(pos.Y - 1), int32(fontSize), Black)
+	// draw 'foreground' text, where it's white
+	DrawText(fmt.Sprintf("%s", name), centeredX, int32(pos.Y), int32(fontSize), White)
+}
 
 func DrawProgressBar(pos Vector2,height int, width int, progress float32, bgColor Color, barColor Color){
 	startPos := NewVector2(pos.X - (float32(width) / 2.0), pos.Y)

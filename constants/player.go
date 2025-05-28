@@ -23,4 +23,8 @@ const (
   HUDHotbarYOffset = 90
   HUDHotbarSlotMargin = 5
   HUDHotbarBorderThickness = 5
+
+	// Screen size
+	ScreenWidth = 1600
+	ScreenHeight = 900
 )
