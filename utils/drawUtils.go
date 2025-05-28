@@ -3,10 +3,15 @@ package utils
 import (
 	"blockProject/constants"
 	"blockProject/textures"
+	gamestate "blockProject/gamestate"
 	types "blockProject/types"
 	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
+)
+
+var (
+	gs *gamestate.GameState
 )
 
 func DrawProgressBar(pos Vector2,height int, width int, progress float32, bgColor Color, barColor Color){
@@ -62,7 +67,7 @@ func DrawCrosshair() {
     )
 }
 
-func drawBlock(b types.Block, ta *textures.BlockAtlas){
+func drawBlock(b types.Block){
   // find center point of block
   centerPoint := b.CenterPoint()
 
@@ -85,7 +90,6 @@ func drawBlock(b types.Block, ta *textures.BlockAtlas){
 			constants.BlockHeight,
 			constants.BlockDepth,
 			&b,
-			ta,
 			)
 		
     // Draw the bounding box to debug
@@ -101,7 +105,8 @@ func drawBlock(b types.Block, ta *textures.BlockAtlas){
   }
 }
 
-func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block, ta *textures.BlockAtlas) {
+func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block) {
+	ta := gamestate.Get().World.BlockAtlas
 	row, col := b.BlockItem.AtlasPosition.Val()
 	blockTexture := textures.NewBlockTexture(ta, row, col)
 
@@ -158,7 +163,7 @@ func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block,
 
 }
 
-func drawChunk(c types.Chunk, w *types.World){
+func drawChunk(c types.Chunk){
   if(len(c.Blocks)) == 0{
     return 
   }
@@ -167,7 +172,7 @@ func drawChunk(c types.Chunk, w *types.World){
     for j := range(len(c.Blocks[0])){
       for k := range(len(c.Blocks[0][0])){
         b := c.Blocks[i][j][k]
-        drawBlock(b, w.BlockAtlas)
+        drawBlock(b)
         count += 1
       }
     }
@@ -179,7 +184,8 @@ func drawChunk(c types.Chunk, w *types.World){
   // fmt.Println("Drew Chunks: ", count)
 }
 
-func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
+func DrawChunks(idcs []types.ChunkIndex) {
+	w := gamestate.Get().World
 
   // moved out to main function
   // idcs := types.GetRenderableChunkIndeces(p, w)
@@ -192,7 +198,7 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
   for _, val := range idcs{
     j, i := val.UnboxChunkIndex()
     c := w.Chunks[i][j]
-    drawChunk(c, &w)
+    drawChunk(c)
   }
 }
 
@@ -202,7 +208,7 @@ func DrawChunks(w types.World, p types.Player, idcs []types.ChunkIndex) {
     different widths of the hotbar, as well as number of items
 
 */
-func DrawHotbar(inv types.Inventory, activeItemSlot int, ia *textures.ItemAtlas) {
+func DrawHotbar(inv types.Inventory, activeItemSlot int) {
   // calculate the required values, such as height, which 
   // would update the slots height and width
 
@@ -232,10 +238,10 @@ func DrawHotbar(inv types.Inventory, activeItemSlot int, ia *textures.ItemAtlas)
     )
 
   // now draw the slots
-  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY), activeItemSlot, ia)
+  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY), activeItemSlot)
 }
 
-func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int, activeSlot int, ia *textures.ItemAtlas) {
+func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int, activeSlot int) {
   // should be able to take variable amount of items,
   // and display the user's hot bar items
   yOffset := constants.HUDHotbarSlotMargin
@@ -250,7 +256,7 @@ func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int
     }
 
     DrawItemSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray, hasBorder)
-    drawItemStack(NewVector2(float32(origX + xOffset), float32(origY + yOffset)),  slots[i], 12, ia)
+    drawItemStack(NewVector2(float32(origX + xOffset), float32(origY + yOffset)),  slots[i], slotSize)
   }
 }
 
@@ -274,7 +280,7 @@ func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color, hasB
   }
 }
 
-func DrawInventory(inv *types.Inventory, ia *textures.ItemAtlas){
+func DrawInventory(inv *types.Inventory){
   // divider between inventory and hotbar items
   dividerHeight := constants.PlayerInventorySlotMargin * 3.0
   // total margin space on y axis (numRows + 1)
@@ -301,10 +307,10 @@ func DrawInventory(inv *types.Inventory, ia *textures.ItemAtlas){
     White)
 
   // Draw the individual slots
-  DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight), ia)
+  DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight))
 }
 
-func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int, ia *textures.ItemAtlas){
+func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int){
   items := inv.Slots
 
   // figure out which slot the user is hovering over
@@ -328,7 +334,7 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
     }
 
     DrawItemSlot(items[i], origVec, slotSize, col, false)
-    drawItemStack(origVec, items[i], slotSize, ia)
+    drawItemStack(origVec, items[i], slotSize)
     // on click handler
   }
 
@@ -339,11 +345,12 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
     inv.HandleItemClick(activeSlot)
   }
   // PrintPlayerHand(inv)
-  drawItemStack(GetMousePosition(), inv.Hand, 50, ia)
+  drawItemStack(GetMousePosition(), inv.Hand, 50)
 }
 
 // will always be square so the size can just be one value
-func drawItemStack(pos Vector2, is types.ItemStack, size int, ia *textures.ItemAtlas){
+func drawItemStack(pos Vector2, is types.ItemStack, size int){
+	ia := gamestate.Get().ItemAtlas
   if is.Item == nil{
     return
   }

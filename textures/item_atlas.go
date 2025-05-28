@@ -48,8 +48,8 @@ func (ia *ItemAtlas) GetRectanglePos(tap TextureAtlasPosition) Rectangle {
 	x := (float32(col) * w)
 	y := (float32(row) * h)
 
-	fmt.Printf("Item rec  is at [%f %f], with h,w of [%f, %f]\n",
-		x, y, h, w)
+	// fmt.Printf("Item rec  is at [%f %f], with h,w of [%f, %f]\n",
+	// 	x, y, h, w)
 
 	return Rectangle{
 		X: x,
