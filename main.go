@@ -11,24 +11,27 @@ import (
 	"blockProject/textures"
 )
 
-var targetFPS int32 = 120
 
-var camera Camera3D
-var renderedChunkIndeces []types.ChunkIndex
-var renderedChunks []*types.Chunk
+var (
+	targetFPS int32 = 120
 
-var gs *gamestate.GameState
+	camera Camera3D
+	renderedChunkIndeces []types.ChunkIndex
+	renderedChunks []*types.Chunk
 
-// These can stay as local state since they're UI-specific
-var focusedBlock *types.Block = nil
-var focusedBlockPosition *types.BlockPosition = nil
-var potentialBlock *types.Block = nil
-var potentialBlockPosition *types.BlockPosition = nil
-var inventoryDisplayed bool = false
-var hotbarDisplayed bool = true
+	gs *gamestate.GameState
+
+	focusedBlock *types.Block = nil
+	focusedBlockPosition *types.BlockPosition = nil
+	potentialBlock *types.Block = nil
+	potentialBlockPosition *types.BlockPosition = nil
+	inventoryDisplayed bool = false
+	hotbarDisplayed bool = true
+
+)
 
 func toggleInventoryStatus(){
-	player := gs.Player // Get player from gamestate
+	player := gs.Player 
 	
 	if inventoryDisplayed {
 		DisableCursor()
