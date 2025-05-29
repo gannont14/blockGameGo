@@ -136,19 +136,9 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
         *potentialBlock,
         RIGHT_CLICK,
         )
-      activeItemStack := &p.Inventory.Slots[p.ActiveItemSlot]
 
-      if(activeItemStack.Item == nil || activeItemStack.Count <= 0){
-        return
-      }
-
-			if activeItemStack.Item.Interact(icx) {
-        // decrease inventory
-        activeItemStack.Count--
-        if activeItemStack.Count <= 0 {
-          activeItemStack.nillify()
-        }
-      }
+			potentialBlock := *potentialBlock
+			potentialBlock.BlockItem.Interact(icx)
 		}
 	} else {
     bm.StopBreaking(p)

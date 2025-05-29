@@ -17,6 +17,7 @@ const (
   GreenBlock
   BrownBlock
   BlackBlock
+	ChestBlock
   //...
 )
 
@@ -89,10 +90,11 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World, ) Block{
 
 func (old *Block) Replace (new *Block) {
   // replace all attributes
-  old.Type          = new.Type
-  old.Focused       = new.Focused
-  old.Color         = new.Color
-	old.BlockItem     = new.BlockItem
+  old.Type                   = new.Type
+  old.Focused                = new.Focused
+  old.Color                  = new.Color
+	old.BlockItem              = new.BlockItem
+	// old.BlockItem.Interactable = new.BlockItem.Interactable
   // other attributes that should be replaced in the future
 }
 

@@ -4,6 +4,7 @@ import (
 	"blockProject/constants"
 	gamestate "blockProject/gamestate"
 	items "blockProject/items"
+	blocks "blockProject/items/blocks"
 	"blockProject/textures"
 	types "blockProject/types"
 	. "blockProject/utils"
@@ -243,16 +244,21 @@ func AddItemsToPlayerInv() {
 
 	GoldPickaxe, _ := world.ItemRegistry.GetItemByName("Gold Pickaxe")
 	player.Inventory.AddItem(GoldPickaxe, 1)
+
+	Chest, _ := world.ItemRegistry.GetItemByName("Chest")
+	player.Inventory.AddItem(Chest, 3)
 }
 
 func RegisterAllItems(r *types.ItemRegistry) {
 	// there HAS to be a better way to do this
-	r.RegisterItem(items.NewAirBlockItem())
-	r.RegisterItem(items.NewRedBlockItem())
-	r.RegisterItem(items.NewBlueBlockItem())
-	r.RegisterItem(items.NewGreenBlockItem())
-	r.RegisterItem(items.NewBrownBlockItem())
-	r.RegisterItem(items.NewBlackBlockItem())
+	r.RegisterItem(blocks.NewAirBlockItem())
+	r.RegisterItem(blocks.NewRedBlockItem())
+	r.RegisterItem(blocks.NewBlueBlockItem())
+	r.RegisterItem(blocks.NewGreenBlockItem())
+	r.RegisterItem(blocks.NewBrownBlockItem())
+	r.RegisterItem(blocks.NewBlackBlockItem())
+	r.RegisterItem(blocks.NewChestBlockItem())
+
 	r.RegisterItem(items.NewWoodenPickaxeItem())
 	r.RegisterItem(items.NewStonePickaxeItem())
 	r.RegisterItem(items.NewIronPickaxeItem())

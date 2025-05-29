@@ -1,8 +1,10 @@
 package types
 
 import (
-	. "github.com/gen2brain/raylib-go/raylib"
 	textures "blockProject/textures"
+	"fmt"
+
+	. "github.com/gen2brain/raylib-go/raylib"
 )
 
 type BlockHardness int 
@@ -24,6 +26,9 @@ type BlockItem struct{
   BlockHardness BlockHardness
 	Color Color
 	AtlasPosition textures.TextureAtlasPosition
+
+	// interaction handler
+	Interactable Interactable
 }
 
 func (b *BlockItem) Clone() Item {
@@ -43,7 +48,37 @@ func (b *BlockItem) Interact(ctx InteractionContext) bool {
 
   // RIGHT CLICK - Place the item
   case RIGHT_CLICK:
-    return ctx.Player.PlaceBlock(ctx, b) // returns true on success or false
+		fmt.Println("Right Click")
+		// check if we are hitting an Interactable block
+		if ctx.FocusedBlock != nil && ctx.FocusedBlock.BlockItem.Interactable != nil {
+			fmt.Println("Interacion")
+			// handle the interaction
+			return ctx.FocusedBlock.BlockItem.Interactable.OnBlockInteract(ctx)
+		}
+
+		// NOW we check if the player has somethign in their hand
+		activeItemStack := &ctx.Player.Inventory.Slots[ctx.Player.ActiveItemSlot]
+
+		if(activeItemStack.Item == nil || activeItemStack.Count <= 0){
+			return false
+		}
+
+		// now check that the thing in their hand is a block
+		if blockItem, isBlockItem := activeItemStack.Item.(*BlockItem); isBlockItem {
+			// not intuitive at all, need to mess with the return values
+			if ctx.Player.PlaceBlock(ctx, blockItem){
+				// decrease inventory
+				activeItemStack.Count--
+				if activeItemStack.Count <= 0 {
+					activeItemStack.nillify()
+				}
+			}
+		}
+
+		// if you made it here, the player is holding a tool, and should use that interaction
+
+
+    return  true
   }
 
   // implement later

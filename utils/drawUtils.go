@@ -36,11 +36,6 @@ func drawItemDurability(item types.Item, pos Vector2, width, height int) {
 	dur := item.(*types.ToolItem).Durability
 	var durPercent float32 = float32(dur) / float32(maxDur)
 
-	if item.GetName() == "Gold Pickaxe"{
-		fmt.Printf("Max Dur: %d\n", maxDur)
-		fmt.Printf("Dur percent: %f\n", durPercent)
-	}
-
 	DrawProgressBar(pos, height, width, float32(durPercent), DarkGray, Green)
 }
 

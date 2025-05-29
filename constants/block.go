@@ -20,4 +20,7 @@ const (
 
 	// item related consts, could be own file
 	DefaultSharpness = 2.0
+
+	// block specific
+	SingleChestInventorySize = 27
 )
