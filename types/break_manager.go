@@ -2,6 +2,7 @@ package types
 
 import (
 	"blockProject/constants"
+	"math"
 	// "fmt"
 
 	. "github.com/gen2brain/raylib-go/raylib"
@@ -159,7 +160,7 @@ func (bm *BreakingManager)calculateBreakTime(block *Block, tool Item) float64 {
   }
   // just base for now, will change when tools implemented
   // get the blockItem from the itemManager
-  blockItem := bm.ItemRegistry.GetBlockByItemType(block.Type)
+  blockItem, _ := bm.ItemRegistry.GetBlockByItemType(block.Type)
 
   // get the tool the player is holding
   tool, isTool := tool.(*ToolItem)
@@ -169,14 +170,19 @@ func (bm *BreakingManager)calculateBreakTime(block *Block, tool Item) float64 {
 	speed := 1.0
 	if isTool {
 		// type is good, now make sure it's the correct tool
-		if tool.(*ToolItem).ToolType == blockItem.PrefToolType {
+		if tool.(*ToolItem).ToolType == blockItem.(*BlockItem).PrefToolType {
 			speed = tool.(*ToolItem).Speed
+		}
+		// check if durability > 0
+		if tool.(*ToolItem).Durability <= 0 {
+			// negative inf
+			speed = float64(math.Inf(-1))
 		}
 	}
 	// TODO: need to add checks to type of block, like 
 	// an axe breakign wood faster and things like that
   
-  return blockItem.BaseBreakTime / speed
+  return blockItem.(*BlockItem).BaseBreakTime / speed
 }
 
 func (bm *BreakingManager) GetItemUsed(p *Player) Item {

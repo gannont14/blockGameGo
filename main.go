@@ -118,13 +118,13 @@ func drawHud() {
 	}
 	if hotbarDisplayed {
 		DrawHotbar(*player.Inventory, player.ActiveItemSlot)
+		// draw item name
+		itemNameOrig := Vector2{X: constants.ScreenWidth / 2 , Y: constants.ScreenHeight - 125}
+		DrawItemName(itemNameOrig, 30)
 	}
 	// draw crosshair
 	DrawCrosshair()
 
-	// draw item name
-	itemNameOrig := Vector2{X: constants.ScreenWidth / 2 , Y: constants.ScreenHeight - 125}
-	DrawItemName(itemNameOrig, 30)
 
 	// debug menu
 	if constants.DEBUG {

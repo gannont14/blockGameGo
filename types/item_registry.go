@@ -36,7 +36,7 @@ func (r *ItemRegistry) RegisterItem (item Item) {
 func (r *ItemRegistry) GetItemByName(itemName string) (Item, bool) {
 	for _, item := range r.items {
 		if item.GetName() == itemName { 
-			return item, true
+			return item.Clone(), true
 		}
 	}
 
@@ -49,19 +49,19 @@ func (r *ItemRegistry) GetItemByID(id int) (Item, bool) {
     return nil, false
   }
 
-  return item, true
+  return item.Clone(), true
 }
 
-func (r *ItemRegistry) GetBlockByItemType(BlockType BlockType) *BlockItem {
+func (r *ItemRegistry) GetBlockByItemType(BlockType BlockType) (Item, bool) {
   for _, item := range r.items {
     if blockItem, ok := item.(*BlockItem); ok{
       if blockItem.Type == BlockType {
-        return blockItem
+				return blockItem.Clone(), true
       }
     }
   }
 
-  return nil
+  return nil, false
 }
 
 func (r *ItemRegistry) GetAllItems() []Item {

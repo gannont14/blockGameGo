@@ -243,10 +243,10 @@ func (p *Player) BreakBlock(info *BreakingInfo, bm *BreakingManager) {
   // replace block with air 
   info.TargetBlock.Replace(&airBlock)
 
-  targetBlockItem := bm.ItemRegistry.GetBlockByItemType(blockCopy.Type)
+  targetBlockItem, _ := bm.ItemRegistry.GetBlockByItemType(blockCopy.Type)
   // handle tool degrading
   activeItem, isTool := p.GetActiveItem()
-  itemShouldDrop := targetBlockItem.IsValidTool(activeItem)
+  itemShouldDrop := targetBlockItem.(*BlockItem).IsValidTool(activeItem)
 
   // handle block dropping functionality here
   if itemShouldDrop {

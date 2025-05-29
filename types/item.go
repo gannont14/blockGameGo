@@ -12,6 +12,7 @@ type Item interface {
   GetName() string 
   GetMaxStackSize() int
   GetAtlasPosition() textures.TextureAtlasPosition
+	Clone() Item
   Interact(InteractionContext) bool
 }
 
@@ -23,7 +24,11 @@ func (b *BaseItem) Interact(ctx InteractionContext) bool {
 func (b *BaseItem) GetId() int { return b.Id }
 func (b *BaseItem) GetName() string { return b.Name }
 func (b *BaseItem) GetMaxStackSize() int { return b.MaxStackSize }
-func (b *BaseItem) GetTextureAtlasPosition() textures.TextureAtlasPosition { return b.AtlasPosition }
+func (b *BaseItem) GetAtlasPosition() textures.TextureAtlasPosition { return b.AtlasPosition }
+func (b *BaseItem) Clone() Item {
+	clone := *b
+	return &clone
+}
 
 type BaseItem struct {
   Id int 

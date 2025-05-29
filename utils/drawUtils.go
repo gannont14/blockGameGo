@@ -4,7 +4,7 @@ import (
 	"blockProject/constants"
 	gamestate "blockProject/gamestate"
 	"blockProject/textures"
-	types "blockProject/types"
+	"blockProject/types"
 	"fmt"
 
 	// "fmt"
@@ -16,13 +16,41 @@ var (
 	gs *gamestate.GameState
 )
 
+func drawItemDurability(item types.Item, pos Vector2, width, height int) {
+	// check if item is tool or somethign with durability
+	if item == nil {
+		return 
+	}
+
+	if gs == nil {
+		gs = gamestate.Get()
+		return 
+	}
+
+	_, isTool := item.(*types.ToolItem)
+	if !isTool {
+		return 
+	}
+
+	maxDur := item.(*types.ToolItem).MaxDurability
+	dur := item.(*types.ToolItem).Durability
+	var durPercent float32 = float32(dur) / float32(maxDur)
+
+	if item.GetName() == "Gold Pickaxe"{
+		fmt.Printf("Max Dur: %d\n", maxDur)
+		fmt.Printf("Dur percent: %f\n", durPercent)
+	}
+
+	DrawProgressBar(pos, height, width, float32(durPercent), DarkGray, Green)
+}
+
 func DrawItemName(pos Vector2, fontSize int) {
 	p := gamestate.Get().Player
 	activeItem, _ := p.GetActiveItem()
 
 	// nothign in hand
 	if activeItem == nil {
-		return 
+		return
 	}
 
 	// grab the name of the active item
@@ -30,74 +58,71 @@ func DrawItemName(pos Vector2, fontSize int) {
 	textWidth := MeasureText(name, int32(fontSize))
 	centeredX := int32(pos.X - (float32(textWidth) / 2))
 
-	// draw 'background' text, where it's black
-	DrawText(fmt.Sprintf("%s", name), centeredX - 1, int32(pos.Y - 1), int32(fontSize), Black)
-	// draw 'foreground' text, where it's white
-	DrawText(fmt.Sprintf("%s", name), centeredX, int32(pos.Y), int32(fontSize), White)
+	drawLayeredText(Vector2{X: float32(centeredX), Y: pos.Y}, name, fontSize, Black, White)
 }
 
-func DrawProgressBar(pos Vector2,height int, width int, progress float32, bgColor Color, barColor Color){
-	startPos := NewVector2(pos.X - (float32(width) / 2.0), pos.Y)
-	endPos := NewVector2(pos.X + (float32(width) / 2.0), pos.Y)
+func DrawProgressBar(pos Vector2, height int, width int, progress float32, bgColor Color, barColor Color) {
+	startPos := NewVector2(pos.X-(float32(width)/2.0), pos.Y)
+	endPos := NewVector2(pos.X+(float32(width)/2.0), pos.Y)
 
 	// background
-	DrawLineEx(startPos, 
+	DrawLineEx(startPos,
 		endPos,
 		float32(height),
 		bgColor)
 
-	// find what width should be 
+	// find what width should be
 	progWidth := progress * float32(width)
-	pStartPos := NewVector2(pos.X - (float32(width) / 2.0), pos.Y)
-	pEndPos := NewVector2(pStartPos.X + progWidth, pos.Y)
+	pStartPos := NewVector2(pos.X-(float32(width)/2.0), pos.Y)
+	pEndPos := NewVector2(pStartPos.X+progWidth, pos.Y)
 
 	// bar
 	DrawLineEx(pStartPos,
 		pEndPos,
 		float32(height),
 		barColor,
-		)
+	)
 }
 
 func DrawCrosshair() {
-  // this is straight from claude, not going to lie
-    // Get screen center
-    screenWidth := GetScreenWidth()
-    screenHeight := GetScreenHeight()
-    centerX := screenWidth / 2
-    centerY := screenHeight / 2
-    
-    // Crosshair settings
-    crosshairSize := 10
-    crosshairThickness := 2
-    crosshairColor := Black
-    
-    // Draw horizontal line
-    DrawLineEx(
-        Vector2{X: float32(centerX - crosshairSize), Y: float32(centerY)},
-        Vector2{X: float32(centerX + crosshairSize), Y: float32(centerY)},
-        float32(crosshairThickness),
-        crosshairColor,
-    )
-    
-    // Draw vertical line
-    DrawLineEx(
-        Vector2{X: float32(centerX), Y: float32(centerY - crosshairSize)},
-        Vector2{X: float32(centerX), Y: float32(centerY + crosshairSize)},
-        float32(crosshairThickness),
-        crosshairColor,
-    )
+	// this is straight from claude, not going to lie
+	// Get screen center
+	screenWidth := GetScreenWidth()
+	screenHeight := GetScreenHeight()
+	centerX := screenWidth / 2
+	centerY := screenHeight / 2
+
+	// Crosshair settings
+	crosshairSize := 10
+	crosshairThickness := 2
+	crosshairColor := Black
+
+	// Draw horizontal line
+	DrawLineEx(
+		Vector2{X: float32(centerX - crosshairSize), Y: float32(centerY)},
+		Vector2{X: float32(centerX + crosshairSize), Y: float32(centerY)},
+		float32(crosshairThickness),
+		crosshairColor,
+	)
+
+	// Draw vertical line
+	DrawLineEx(
+		Vector2{X: float32(centerX), Y: float32(centerY - crosshairSize)},
+		Vector2{X: float32(centerX), Y: float32(centerY + crosshairSize)},
+		float32(crosshairThickness),
+		crosshairColor,
+	)
 }
 
-func drawBlock(b types.Block){
-  // find center point of block
-  centerPoint := b.CenterPoint()
+func drawBlock(b types.Block) {
+	// find center point of block
+	centerPoint := b.CenterPoint()
 
-  if b.Type != types.Air{
+	if b.Type != types.Air {
 
 		// nilPos := textures.TextureAtlasPosition{}
 		// if b.BlockItem.AtlasPosition ==  nilPos {
-			// fallback
+		// fallback
 		// 	DrawCube(centerPoint,
 		// 		constants.BlockWidth,
 		// 		constants.BlockHeight,
@@ -112,19 +137,19 @@ func drawBlock(b types.Block){
 			constants.BlockHeight,
 			constants.BlockDepth,
 			&b,
-			)
-		
-    // Draw the bounding box to debug
-    // DrawBoundingBox(b.BoundBox, Blue)
-  }
+		)
 
-  if b.Focused{
-    DrawCubeWires(centerPoint,
-      constants.BlockWidth,
-      constants.BlockHeight,
-      constants.BlockDepth,
-      Black)
-  }
+		// Draw the bounding box to debug
+		// DrawBoundingBox(b.BoundBox, Blue)
+	}
+
+	if b.Focused {
+		DrawCubeWires(centerPoint,
+			constants.BlockWidth,
+			constants.BlockHeight,
+			constants.BlockDepth,
+			Black)
+	}
 }
 
 func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block) {
@@ -133,19 +158,19 @@ func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block)
 	blockTexture := textures.NewBlockTexture(ta, row, col)
 
 	// half of each
-  hs_w := width / 2
-  hs_h := height / 2  
-  hs_d := depth / 2
+	hs_w := width / 2
+	hs_h := height / 2
+	hs_d := depth / 2
 
-  // Define vertices of cube
-  v000 := Vector3{X: pos.X - hs_w, Y: pos.Y - hs_h, Z: pos.Z - hs_d}
-  v001 := Vector3{X: pos.X - hs_w, Y: pos.Y - hs_h, Z: pos.Z + hs_d}
-  v010 := Vector3{X: pos.X - hs_w, Y: pos.Y + hs_h, Z: pos.Z - hs_d}
-  v011 := Vector3{X: pos.X - hs_w, Y: pos.Y + hs_h, Z: pos.Z + hs_d}
-  v100 := Vector3{X: pos.X + hs_w, Y: pos.Y - hs_h, Z: pos.Z - hs_d}
-  v101 := Vector3{X: pos.X + hs_w, Y: pos.Y - hs_h, Z: pos.Z + hs_d}
-  v110 := Vector3{X: pos.X + hs_w, Y: pos.Y + hs_h, Z: pos.Z - hs_d}
-  v111 := Vector3{X: pos.X + hs_w, Y: pos.Y + hs_h, Z: pos.Z + hs_d}
+	// Define vertices of cube
+	v000 := Vector3{X: pos.X - hs_w, Y: pos.Y - hs_h, Z: pos.Z - hs_d}
+	v001 := Vector3{X: pos.X - hs_w, Y: pos.Y - hs_h, Z: pos.Z + hs_d}
+	v010 := Vector3{X: pos.X - hs_w, Y: pos.Y + hs_h, Z: pos.Z - hs_d}
+	v011 := Vector3{X: pos.X - hs_w, Y: pos.Y + hs_h, Z: pos.Z + hs_d}
+	v100 := Vector3{X: pos.X + hs_w, Y: pos.Y - hs_h, Z: pos.Z - hs_d}
+	v101 := Vector3{X: pos.X + hs_w, Y: pos.Y - hs_h, Z: pos.Z + hs_d}
+	v110 := Vector3{X: pos.X + hs_w, Y: pos.Y + hs_h, Z: pos.Z - hs_d}
+	v111 := Vector3{X: pos.X + hs_w, Y: pos.Y + hs_h, Z: pos.Z + hs_d}
 
 	// Helper to draw a face with texture coordinates
 	drawFace := func(a, b, c, d Vector3, coords [4]Vector2) {
@@ -172,222 +197,232 @@ func drawTexturedCube(pos Vector3, width, height, depth float32, b *types.Block)
 		End()
 	}
 
-  // Get the BlockTextureMap from the BlockTexture
-  textureMap := blockTexture.BlockTexturemap
+	// Get the BlockTextureMap from the BlockTexture
+	textureMap := blockTexture.BlockTexturemap
 
-  // Draw each face with corresponding texture coordinates
-  drawFace(v011, v111, v110, v010, textureMap["top"])    // Top face (Y+)
-  drawFace(v000, v100, v101, v001, textureMap["bottom"]) // Bottom face (Y-)
-  drawFace(v001, v101, v111, v011, textureMap["front"])  // Front face (Z+)
-  drawFace(v100, v000, v010, v110, textureMap["back"])   // Back face (Z-)
-  drawFace(v000, v001, v011, v010, textureMap["left"])   // Left face (X-)
-  drawFace(v101, v100, v110, v111, textureMap["right"])  // Right face (X+)
+	// Draw each face with corresponding texture coordinates
+	drawFace(v011, v111, v110, v010, textureMap["top"])    // Top face (Y+)
+	drawFace(v000, v100, v101, v001, textureMap["bottom"]) // Bottom face (Y-)
+	drawFace(v001, v101, v111, v011, textureMap["front"])  // Front face (Z+)
+	drawFace(v100, v000, v010, v110, textureMap["back"])   // Back face (Z-)
+	drawFace(v000, v001, v011, v010, textureMap["left"])   // Left face (X-)
+	drawFace(v101, v100, v110, v111, textureMap["right"])  // Right face (X+)
 
 }
 
-func drawChunk(c types.Chunk){
-  if(len(c.Blocks)) == 0{
-    return 
-  }
-  count := 0
-  for i := range (len(c.Blocks)){
-    for j := range(len(c.Blocks[0])){
-      for k := range(len(c.Blocks[0][0])){
-        b := c.Blocks[i][j][k]
-        drawBlock(b)
-        count += 1
-      }
-    }
-  }
+func drawChunk(c types.Chunk) {
+	if (len(c.Blocks)) == 0 {
+		return
+	}
+	count := 0
+	for i := range len(c.Blocks) {
+		for j := range len(c.Blocks[0]) {
+			for k := range len(c.Blocks[0][0]) {
+				b := c.Blocks[i][j][k]
+				drawBlock(b)
+				count += 1
+			}
+		}
+	}
 
-  // DEBUG, draw borde around chunk
-  DrawChunkBorder(c)
+	// DEBUG, draw borde around chunk
+	DrawChunkBorder(c)
 
-  // fmt.Println("Drew Chunks: ", count)
+	// fmt.Println("Drew Chunks: ", count)
 }
 
 func DrawChunks(idcs []types.ChunkIndex) {
 	w := gamestate.Get().World
 
-  // moved out to main function
-  // idcs := types.GetRenderableChunkIndeces(p, w)
+	// moved out to main function
+	// idcs := types.GetRenderableChunkIndeces(p, w)
 
-  if len(idcs) == 0{
-    return
-  }
+	if len(idcs) == 0 {
+		return
+	}
 
-  // new and improved
-  for _, val := range idcs{
-    j, i := val.UnboxChunkIndex()
-    c := w.Chunks[i][j]
-    drawChunk(c)
-  }
+	// new and improved
+	for _, val := range idcs {
+		j, i := val.UnboxChunkIndex()
+		c := w.Chunks[i][j]
+		drawChunk(c)
+	}
 }
 
 /*
-
-    this is WAY WAY WAY overengineered to be flexible with 
-    different widths of the hotbar, as well as number of items
-
+this is WAY WAY WAY overengineered to be flexible with
+different widths of the hotbar, as well as number of items
 */
 func DrawHotbar(inv types.Inventory, activeItemSlot int) {
-  // calculate the required values, such as height, which 
-  // would update the slots height and width
+	// calculate the required values, such as height, which
+	// would update the slots height and width
 
-  l := len(inv.Slots)
-  numHBSlots := constants.PlayerInventoryCols
-  hotbarItemStacks := inv.Slots[(l - numHBSlots): l ]
+	l := len(inv.Slots)
+	numHBSlots := constants.PlayerInventoryCols
+	hotbarItemStacks := inv.Slots[(l - numHBSlots):l]
 
-  // figure out how many margins
-  numMargins := numHBSlots + 1
+	// figure out how many margins
+	numMargins := numHBSlots + 1
 
-  // How much space total the margins take up
-  xMarginSpace := (numMargins * constants.HUDHotbarSlotMargin)
-  // slot height/width
-  slotSize := (constants.HUDHotbarWidth - xMarginSpace) / numHBSlots
-  // find hotbar height now based on that
-  HUDHotbarHeight := slotSize + (2 * constants.HUDHotbarSlotMargin)
+	// How much space total the margins take up
+	xMarginSpace := (numMargins * constants.HUDHotbarSlotMargin)
+	// slot height/width
+	slotSize := (constants.HUDHotbarWidth - xMarginSpace) / numHBSlots
+	// find hotbar height now based on that
+	HUDHotbarHeight := slotSize + (2 * constants.HUDHotbarSlotMargin)
 
-  origX := int32(GetScreenWidth()/2) - (constants.HUDHotbarWidth/2)
-  origY := int32(GetScreenHeight()) - constants.HUDHotbarYOffset
+	origX := int32(GetScreenWidth()/2) - (constants.HUDHotbarWidth / 2)
+	origY := int32(GetScreenHeight()) - constants.HUDHotbarYOffset
 
-  // background
-  DrawRectangle(origX,
-    origY,
-    constants.HUDHotbarWidth,
-    int32(HUDHotbarHeight),
-    White,
-    )
+	// background
+	DrawRectangle(origX,
+		origY,
+		constants.HUDHotbarWidth,
+		int32(HUDHotbarHeight),
+		White,
+	)
 
-  // now draw the slots
-  DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY), activeItemSlot)
+	// now draw the slots
+	DrawHotBarSlots(hotbarItemStacks, slotSize, int(origX), int(origY), activeItemSlot)
 }
 
 func DrawHotBarSlots(slots []types.ItemStack, slotSize int, origX int, origY int, activeSlot int) {
-  // should be able to take variable amount of items,
-  // and display the user's hot bar items
-  yOffset := constants.HUDHotbarSlotMargin
-  for i:=range slots{
-    hasBorder := false
-    xOffset := (i * (slotSize + constants.HUDHotbarSlotMargin)) + constants.HUDHotbarSlotMargin
+	// should be able to take variable amount of items,
+	// and display the user's hot bar items
+	yOffset := constants.HUDHotbarSlotMargin
+	for i := range slots {
+		hasBorder := false
+		xOffset := (i * (slotSize + constants.HUDHotbarSlotMargin)) + constants.HUDHotbarSlotMargin
 
-    // check if it is the player's active slot
-    // fmt.Printf("Current: %d Active: %d\n", i, activeSlot)
-    if i == activeSlot - constants.HotbarOffset {
-      hasBorder = true
-    }
+		// check if it is the player's active slot
+		// fmt.Printf("Current: %d Active: %d\n", i, activeSlot)
+		if i == activeSlot-constants.HotbarOffset {
+			hasBorder = true
+		}
 
-    DrawItemSlot(slots[i], NewVector2(float32(origX + xOffset), float32(origY + yOffset)), slotSize, Gray, hasBorder)
-    drawItemStack(NewVector2(float32(origX + xOffset), float32(origY + yOffset)),  slots[i], slotSize)
-  }
+		DrawItemSlot(slots[i], NewVector2(float32(origX+xOffset), float32(origY+yOffset)), slotSize, Gray, hasBorder)
+		drawItemStack(NewVector2(float32(origX+xOffset), float32(origY+yOffset)), slots[i], slotSize)
+	}
 }
 
 func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color, hasBorder bool) {
-  DrawRectangle(
-    int32(pos.X), 
-    int32(pos.Y),
-    int32(slotSize),
-    int32(slotSize),
-    col,
-    )
-  if hasBorder {
-    // draw the active border around the item
-    rec := NewRectangle(
-      pos.X - constants.HUDHotbarBorderThickness, 
-      pos.Y - constants.HUDHotbarBorderThickness,
-      float32(slotSize + (2*constants.HUDHotbarBorderThickness)),
-      float32(slotSize + (2*constants.HUDHotbarBorderThickness)),
-      )
-    DrawRectangleLinesEx(rec, constants.HUDHotbarBorderThickness, DarkGray)
-  }
+	DrawRectangle(
+		int32(pos.X),
+		int32(pos.Y),
+		int32(slotSize),
+		int32(slotSize),
+		col,
+	)
+	if hasBorder {
+		// draw the active border around the item
+		rec := NewRectangle(
+			pos.X-constants.HUDHotbarBorderThickness,
+			pos.Y-constants.HUDHotbarBorderThickness,
+			float32(slotSize+(2*constants.HUDHotbarBorderThickness)),
+			float32(slotSize+(2*constants.HUDHotbarBorderThickness)),
+		)
+		DrawRectangleLinesEx(rec, constants.HUDHotbarBorderThickness, DarkGray)
+	}
 }
 
-func DrawInventory(inv *types.Inventory){
-  // divider between inventory and hotbar items
-  dividerHeight := constants.PlayerInventorySlotMargin * 3.0
-  // total margin space on y axis (numRows + 1)
-  marginSpaceY := (constants.PlayerInventoryRows * constants.PlayerInventorySlotMargin) + dividerHeight
-  marginSpaceX := constants.PlayerInventoryCols * constants.PlayerInventorySlotMargin
-  
-  // slot size 
-  slotSize := (constants.PlayerInventoryWidth - (marginSpaceX)) / constants.PlayerInventoryCols
+func DrawInventory(inv *types.Inventory) {
+	// divider between inventory and hotbar items
+	dividerHeight := constants.PlayerInventorySlotMargin * 3.0
+	// total margin space on y axis (numRows + 1)
+	marginSpaceY := (constants.PlayerInventoryRows * constants.PlayerInventorySlotMargin) + dividerHeight
+	marginSpaceX := constants.PlayerInventoryCols * constants.PlayerInventorySlotMargin
 
-  // calculate what the height should be
-  PlayerInventoryHeight := int(marginSpaceY) + (slotSize * constants.PlayerInventoryRows)
+	// slot size
+	slotSize := (constants.PlayerInventoryWidth - (marginSpaceX)) / constants.PlayerInventoryCols
 
-  // calculate the origin
-  origX := (int32(GetScreenWidth()) / 2) - (constants.PlayerInventoryWidth / 2)
-  origY := (int32(GetScreenHeight()) / 2) - (int32(PlayerInventoryHeight) / 2)
+	// calculate what the height should be
+	PlayerInventoryHeight := int(marginSpaceY) + (slotSize * constants.PlayerInventoryRows)
 
-  bgOrigX := origX - constants.PlayerInventorySlotMargin
-  bgOrigY := origY - constants.PlayerInventorySlotMargin
+	// calculate the origin
+	origX := (int32(GetScreenWidth()) / 2) - (constants.PlayerInventoryWidth / 2)
+	origY := (int32(GetScreenHeight()) / 2) - (int32(PlayerInventoryHeight) / 2)
 
-  // Draw the background
-  DrawRectangle(bgOrigX , bgOrigY,
-    constants.PlayerInventoryWidth + (2 * constants.PlayerInventorySlotMargin),
-    int32(PlayerInventoryHeight) + (2 * constants.PlayerInventorySlotMargin),
-    White)
+	bgOrigX := origX - constants.PlayerInventorySlotMargin
+	bgOrigY := origY - constants.PlayerInventorySlotMargin
 
-  // Draw the individual slots
-  DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight))
+	// Draw the background
+	DrawRectangle(bgOrigX, bgOrigY,
+		constants.PlayerInventoryWidth+(2*constants.PlayerInventorySlotMargin),
+		int32(PlayerInventoryHeight)+(2*constants.PlayerInventorySlotMargin),
+		White)
+
+	// Draw the individual slots
+	DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight))
 }
 
-func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int){
-  items := inv.Slots
+func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int) {
+	items := inv.Slots
 
-  // figure out which slot the user is hovering over
-  activeSlot := -1
+	// figure out which slot the user is hovering over
+	activeSlot := -1
 
-  for i := range items {
-    r, c := slotIndexToCoord(i)
-    xOffset := (c * (slotSize + constants.PlayerInventorySlotMargin)) + constants.PlayerInventorySlotMargin
-    yOffset := (r * (slotSize + constants.PlayerInventorySlotMargin)) + constants.PlayerInventorySlotMargin
+	for i := range items {
+		r, c := slotIndexToCoord(i)
+		xOffset := (c * (slotSize + constants.PlayerInventorySlotMargin)) + constants.PlayerInventorySlotMargin
+		yOffset := (r * (slotSize + constants.PlayerInventorySlotMargin)) + constants.PlayerInventorySlotMargin
 
-    // for vals under the divider (hotbar item)
-    if r == (constants.PlayerInventoryRows - 1){
-      yOffset += dividerHeight
-    }
-    col := Gray
-    origVec := NewVector2(float32(origX + xOffset), float32(origY + yOffset))
-    // check if mouse in that square
-    if pointInRectangle(GetMousePosition(), origVec, slotSize, slotSize){
-      activeSlot = i 
-      col = LightGray
-    }
+		// for vals under the divider (hotbar item)
+		if r == (constants.PlayerInventoryRows - 1) {
+			yOffset += dividerHeight
+		}
+		col := Gray
+		origVec := NewVector2(float32(origX+xOffset), float32(origY+yOffset))
+		// check if mouse in that square
+		if pointInRectangle(GetMousePosition(), origVec, slotSize, slotSize) {
+			activeSlot = i
+			col = LightGray
+		}
 
-    DrawItemSlot(items[i], origVec, slotSize, col, false)
-    drawItemStack(origVec, items[i], slotSize)
-    // on click handler
-  }
+		DrawItemSlot(items[i], origVec, slotSize, col, false)
+		drawItemStack(origVec, items[i], slotSize)
+		// on click handler
+	}
 
-  types.UpdateActiveSelectedSlot(activeSlot)
-  // after the draw call, make sure that there is an active slot
-  if IsMouseButtonPressed(MouseLeftButton) {
-    // update the inventory accordignly
-    inv.HandleItemClick(activeSlot)
-  }
-  // PrintPlayerHand(inv)
-  drawItemStack(GetMousePosition(), inv.Hand, 50)
+	types.UpdateActiveSelectedSlot(activeSlot)
+	// after the draw call, make sure that there is an active slot
+	if IsMouseButtonPressed(MouseLeftButton) {
+		// update the inventory accordignly
+		inv.HandleItemClick(activeSlot)
+	}
+	// PrintPlayerHand(inv)
+	drawItemStack(GetMousePosition(), inv.Hand, 50)
 }
 
 // will always be square so the size can just be one value
-func drawItemStack(pos Vector2, is types.ItemStack, size int){
+func drawItemStack(pos Vector2, is types.ItemStack, size int) {
 	ia := gamestate.Get().ItemAtlas
-  if is.Item == nil{
-    return
-  }
-  // for now will draw the item ID and then the count
-  // itemName := fmt.Sprint(is.Item.GetName())
-  // itemCount := fmt.Sprint(is.Count)
+	if is.Item == nil {
+		return
+	}
+	// for now will draw the item ID and then the count
+	// itemName := fmt.Sprint(is.Item.GetName())
+	itemCount := fmt.Sprint(is.Count)
 
 	rec := ia.GetRectanglePos(is.Item.GetAtlasPosition())
 	drawScaledRectangle(rec, pos, float32(size), ia)
 
-  // Draw the item's ID in the center
-  // DrawText(itemName, int32(pos.X), int32(pos.Y), 12, Blue)
+	// Draw the item's ID in the center
+	// DrawText(itemName, int32(pos.X), int32(pos.Y), 12, Blue)
 
-  // Daw the item's count
-  // DrawText(itemCount, int32(pos.X), int32(pos.Y), 25, Red)
+	// Daw the item's count
+	DrawText(itemCount, int32(pos.X), int32(pos.Y), 25, Red)
+
+	// draw the items durability, in the bottom third
+	durPos := Vector2{X: pos.X + float32(size/2), Y: pos.Y + float32(size* 9/10)}
+	drawItemDurability(is.Item, durPos, int(float32(size) * float32(0.7)), 5)
+}
+
+func drawLayeredText(pos Vector2, text string, fontSize int, bgColor, fgColor Color) {
+	// draw 'background' text, where it's black
+	DrawText(fmt.Sprintf("%s", text), int32(pos.X-1), int32(pos.Y-1), int32(fontSize), bgColor)
+	// draw 'foreground' text, where it's white
+	DrawText(fmt.Sprintf("%s", text), int32(pos.X), int32(pos.Y), int32(fontSize), fgColor)
+
 }
 
 func drawScaledRectangle(tileRec Rectangle, pos Vector2, size float32, ia *textures.ItemAtlas) {
@@ -396,30 +431,26 @@ func drawScaledRectangle(tileRec Rectangle, pos Vector2, size float32, ia *textu
 	DrawTexturePro(ia.Texture, tileRec, scaledRec, NewVector2(0, 0), 0.0, White)
 }
 
-
 func slotIndexToCoord(ind int) (int, int) {
-  // should never go over the amount of slots
-  row := int(ind / constants.PlayerInventoryCols)
-  col := ind % constants.PlayerInventoryCols
+	// should never go over the amount of slots
+	row := int(ind / constants.PlayerInventoryCols)
+	col := ind % constants.PlayerInventoryCols
 
-  // fmt.Printf("Ind: %d, Row: %d, Col: %d\n",ind, row, col)
+	// fmt.Printf("Ind: %d, Row: %d, Col: %d\n",ind, row, col)
 
-  return row, col
+	return row, col
 }
 
 func pointInRectangle(point Vector2, orig Vector2, height int, width int) bool {
-  // check x 
-  px := int(point.X) // annoying to type cast every time
-  ox := int(orig.X) // annoying to type cast every time
-  checkX := (px > ox) && (px < (ox + width))
-  
-  // check y
-  py := int(point.Y) // annoying to type cast every time
-  oy := int(orig.Y) // annoying to type cast every time
-  checkY := (py > oy) && (py < (oy + height))
+	// check x
+	px := int(point.X) // annoying to type cast every time
+	ox := int(orig.X)  // annoying to type cast every time
+	checkX := (px > ox) && (px < (ox + width))
 
-  return checkX && checkY
+	// check y
+	py := int(point.Y) // annoying to type cast every time
+	oy := int(orig.Y)  // annoying to type cast every time
+	checkY := (py > oy) && (py < (oy + height))
+
+	return checkX && checkY
 }
-
-
-

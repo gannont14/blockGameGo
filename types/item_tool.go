@@ -1,19 +1,20 @@
 package types
 
-import "blockProject/textures"
 
 
 type ToolItem struct{
   BaseItem
   Durability int 
+	MaxDurability int
   ToolType ToolType
   ToolLevel ToolLevel 
   Speed float64 // could also be added to the tooltype type, type type type
 	Sharpness float64
 }
 
-func (t *ToolItem) GetAtlasPosition() textures.TextureAtlasPosition {
-	return t.BaseItem.AtlasPosition
+func (t *ToolItem) Clone() Item {
+	clone := *t
+	return &clone
 }
 
 func (t *ToolItem) Interact(ctx InteractionContext) bool {

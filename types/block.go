@@ -62,14 +62,14 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World, ) Block{
   //   )
 	// find from registry for the correct color
 	color := Blank
-	blockItem := w.ItemRegistry.GetBlockByItemType(t)
+	blockItem, exists := w.ItemRegistry.GetBlockByItemType(t)
 
-	if blockItem == nil {
+	if exists == false {
 		// fmt.Println("block item not found of type: ", t)
 	} else {
 		if t != 0 {
 			// fmt.Printf("block item found of type: %d\n", t)
-			color = blockItem.Color
+			color = blockItem.(*BlockItem).Color
 			// fmt.Printf("Block type %d: Found color %v (R:%d G:%d B:%d A:%d)\n", 
 				// t, blockItem.Name, color.R, color.G, color.B, color.A)
 		}
@@ -82,7 +82,7 @@ func NewBlock(t BlockType, pos Vector3, bp BlockPosition, w *World, ) Block{
     Focused: false,
     BoundBox: NewBoundingBox(bbMin, bbMax),
 		Color: color,
-		BlockItem: blockItem,
+		BlockItem: blockItem.(*BlockItem),
   }
   return b
 }
