@@ -391,6 +391,49 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
 	}
 	// PrintPlayerHand(inv)
 	drawItemStack(GetMousePosition(), inv.Hand, 50)
+
+	if activeSlot >= 0 {
+		// draw the item name
+		drawHoveringItemName(*inv,
+			GetMousePosition(),
+			activeSlot, 30)
+	}
+}
+
+func drawHoveringItemName(inv types.Inventory, mousePos Vector2, activeSlot, fontSize int) {
+	// figure out what item is in the players hand
+	itemStack := inv.Slots[activeSlot]
+	// empty
+	if itemStack.Item == nil {
+		return
+	}
+
+	// pull out item name
+	name := itemStack.Item.GetName()
+	nameWidth := MeasureText(name, int32(fontSize))
+
+	textPosX, textPosY := mousePos.X + 3, mousePos.Y + float32(fontSize + 2)
+
+	//  determine origin based on the whether or not it would stay on screen
+	if (mousePos.X + float32(nameWidth)) > constants.ScreenWidth {
+		// invert (subtract the text width and a few)
+		textPosX -= float32(nameWidth + 3) 
+	}
+
+	// draw background now
+	DrawRectangle(int32(textPosX),
+		int32(textPosY),
+		nameWidth + 10,
+		int32(fontSize) + 2,
+		DarkGray)
+
+	// now draw the text over top
+	drawLayeredText(Vector2{X: textPosX + 2, Y: textPosY + 2},
+		name,
+		fontSize, 
+		Black,
+		White)
+
 }
 
 // will always be square so the size can just be one value

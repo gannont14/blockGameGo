@@ -1,9 +1,7 @@
 package types
 
 
-import (
-  // constants "blockProject/constants"
-)
+// constants "blockProject/constants"
 
 var activeSelectedSlot int = -1
 
