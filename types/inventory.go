@@ -4,13 +4,12 @@ package types
 // constants "blockProject/constants"
 
 var activeSelectedSlot int = -1
-
 type Inventory struct {
   // not sure if this should be a 1d or 2d array but we will go with 1
-  Slots []ItemStack
-  Hand ItemStack
-  MaxSlots int
-  OwnerType string // could get it's own type if needed later
+  Slots        []ItemStack
+  Hand           ItemStack
+  MaxSlots       int
+  OwnerType      string // could get it's own type if needed later
 }
 
 type ItemStack struct {

@@ -8,13 +8,16 @@ import (
 )
 
 type Player struct{
-  Id int;
-  Pos Vector3;
-  World *World;
-  Cam *Camera;
-  Inventory *Inventory
-  CanMoveCamera bool
-  ActiveItemSlot int
+  Id              int
+  Pos             Vector3
+  World          *World
+  Cam            *Camera
+  Inventory      *Inventory
+  InventoryOpen   bool
+  CanMoveCamera   bool
+  ActiveItemSlot  int
+	ChestOpen      *Inventory
+
 }
 
 func NewPlayer(startPos Vector3, c *Camera, w *World) Player{
@@ -27,11 +30,14 @@ func NewPlayer(startPos Vector3, c *Camera, w *World) Player{
 		World: w,
     Cam: c,
     Inventory: NewInventory(numInvSlots, "PlayerInventory"),
+		InventoryOpen: false,
     CanMoveCamera: true,
     ActiveItemSlot: activeSlot, // The first item of the players hotbar
+		ChestOpen: nil,
   }
   return p
 }
+
 
 func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
 	focusedBlock **Block,

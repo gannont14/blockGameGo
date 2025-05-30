@@ -16,6 +16,47 @@ var (
 	gs *gamestate.GameState
 )
 
+// this is an absolute mess, don't ask
+type InventoryDimensionInformation struct {
+	DividerHeight   float64
+	MarginSpaceY    float64
+	MarginSpaceX    int
+	SlotSize        int
+	InventoryHeight int
+}
+
+func DrawChestInventory(chestInv *types.Inventory) {
+	// player ivn information
+	playerI := CalculatePlayerInventoryDimensionInformation(constants.PlayerInventoryRows,
+		constants.PlayerInventoryCols)
+
+	// check inv information
+	chestI := CalculatePlayerInventoryDimensionInformation(chestInv.MaxSlots / 9,
+		constants.PlayerInventoryCols)
+
+	totalHeight := playerI.InventoryHeight + chestI.InventoryHeight
+	w_h := constants.ScreenWidth / 2
+	h_h := constants.ScreenHeight / 2
+
+	tw_h := constants.PlayerInventoryWidth / 2
+	th_h := totalHeight / 2
+
+	// draw the chest interface above 
+	chestUIPos := Vector2{
+		X: float32(w_h - tw_h),
+		Y: float32(h_h - th_h),
+	}
+	DrawInventory(chestInv, chestUIPos, false, false, chestI)
+
+	playerUIPos := Vector2{
+		X: float32(w_h - tw_h),
+		Y: float32(h_h - th_h + chestI.InventoryHeight),
+	}
+
+	// draw the player inventory below
+	DrawInventory(gs.Player.Inventory, playerUIPos, false, true, playerI)
+}
+
 func drawItemDurability(item types.Item, pos Vector2, width, height int) {
 	// check if item is tool or somethign with durability
 	if item == nil {
@@ -320,12 +361,12 @@ func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color, hasB
 	}
 }
 
-func DrawInventory(inv *types.Inventory) {
+func CalculatePlayerInventoryDimensionInformation(rows, cols int) InventoryDimensionInformation{
 	// divider between inventory and hotbar items
 	dividerHeight := constants.PlayerInventorySlotMargin * 3.0
 	// total margin space on y axis (numRows + 1)
-	marginSpaceY := (constants.PlayerInventoryRows * constants.PlayerInventorySlotMargin) + dividerHeight
-	marginSpaceX := constants.PlayerInventoryCols * constants.PlayerInventorySlotMargin
+	marginSpaceY := float64(rows * constants.PlayerInventorySlotMargin) + dividerHeight
+	marginSpaceX := cols * constants.PlayerInventorySlotMargin
 
 	// slot size
 	slotSize := (constants.PlayerInventoryWidth - (marginSpaceX)) / constants.PlayerInventoryCols
@@ -333,9 +374,18 @@ func DrawInventory(inv *types.Inventory) {
 	// calculate what the height should be
 	PlayerInventoryHeight := int(marginSpaceY) + (slotSize * constants.PlayerInventoryRows)
 
-	// calculate the origin
-	origX := (int32(GetScreenWidth()) / 2) - (constants.PlayerInventoryWidth / 2)
-	origY := (int32(GetScreenHeight()) / 2) - (int32(PlayerInventoryHeight) / 2)
+	return InventoryDimensionInformation{
+		DividerHeight: dividerHeight,
+		MarginSpaceY: marginSpaceY,
+		MarginSpaceX: marginSpaceX,
+		SlotSize: slotSize,
+		InventoryHeight: PlayerInventoryHeight,
+	}
+}
+
+func DrawInventory(inv *types.Inventory, pos Vector2, displayName bool, hasDivider bool ,inf InventoryDimensionInformation) {
+
+	origX, origY := int32(pos.X), int32(pos.Y)
 
 	bgOrigX := origX - constants.PlayerInventorySlotMargin
 	bgOrigY := origY - constants.PlayerInventorySlotMargin
@@ -343,11 +393,15 @@ func DrawInventory(inv *types.Inventory) {
 	// Draw the background
 	DrawRectangle(bgOrigX, bgOrigY,
 		constants.PlayerInventoryWidth+(2*constants.PlayerInventorySlotMargin),
-		int32(PlayerInventoryHeight)+(2*constants.PlayerInventorySlotMargin),
+		int32(inf.InventoryHeight)+(2*constants.PlayerInventorySlotMargin),
 		White)
 
 	// Draw the individual slots
-	DrawInventorySlots(inv, int(origX), int(origY), slotSize, int(dividerHeight))
+	if hasDivider {
+		DrawInventorySlots(inv, int(origX), int(origY), inf.SlotSize, int(inf.DividerHeight))
+	}else {
+		DrawInventorySlots(inv, int(origX), int(origY), inf.SlotSize, 0)
+	}
 }
 
 func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int) {

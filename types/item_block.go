@@ -76,8 +76,6 @@ func (b *BlockItem) Interact(ctx InteractionContext) bool {
 		}
 
 		// if you made it here, the player is holding a tool, and should use that interaction
-
-
     return  true
   }
 

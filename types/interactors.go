@@ -1,6 +1,9 @@
 package types
 
-import "fmt"
+import(
+	"fmt"
+	. "github.com/gen2brain/raylib-go/raylib"
+) 
 
 /*
    All interactors for different types of interactable blocks
@@ -27,7 +30,39 @@ func NewChestInteractor(invSize int) *ChestInteractor{
 }
 
 func (ci *ChestInteractor) OnBlockInteract(ctx InteractionContext) bool {
-	fmt.Println("Openign chest")
+	player := ctx.Player
+
+	// chest open
+	if player.ChestOpen != nil{
+		// this shouldn't ever happen? if they right click
+		// in a chest it should do the inv stuff
+		fmt.Println("Right click in open chest")
+		// ci.closeChest(player)
+	} else {
+		ci.openChest(player)
+	}
+
 	return true
 }
 
+
+
+
+
+/*
+---------------------Utils---------------------
+*/
+
+func (ci *ChestInteractor) openChest(player *Player) {
+	EnableCursor()
+	player.ChestOpen     = ci.Inventory
+	player.CanMoveCamera = false
+	player.InventoryOpen = true
+}
+
+func (ci *ChestInteractor) closeChest(player *Player) {
+	DisableCursor()
+	player.ChestOpen     = nil
+	player.CanMoveCamera = true
+	player.InventoryOpen = false
+}

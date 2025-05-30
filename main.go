@@ -1,16 +1,19 @@
 package main
 
 import (
-	"blockProject/constants"
+	          "blockProject/constants"
 	gamestate "blockProject/gamestate"
-	items "blockProject/items"
-	blocks "blockProject/items/blocks"
-	"blockProject/textures"
-	types "blockProject/types"
-	. "blockProject/utils"
-	"fmt"
-	. "github.com/gen2brain/raylib-go/raylib"
+	items     "blockProject/items"
+	blocks    "blockProject/items/blocks"
+	          "blockProject/textures"
+	types     "blockProject/types"
+	.         "blockProject/utils"
+	          "fmt"
+	.         "github.com/gen2brain/raylib-go/raylib"
 )
+
+/*
+*/
 
 var (
 	targetFPS int32 = 120
@@ -32,19 +35,16 @@ var (
 func toggleInventoryStatus() {
 	player := gs.Player
 
-	if inventoryDisplayed {
-		DisableCursor()
-		player.CanMoveCamera = true
-		inventoryDisplayed = false
-		hotbarDisplayed = true
-		return
+	if player.InventoryOpen {
+		// check if in chest 
+		if player.ChestOpen != nil {
+			closeCurrentChest(player)
+		} else {
+			closeInventory(player)
+		}
+	} else {
+		openInventory(player)
 	}
-
-	EnableCursor()
-	player.CanMoveCamera = false
-	inventoryDisplayed = true
-	hotbarDisplayed = false
-	return
 }
 
 func initGame() {
@@ -113,10 +113,28 @@ func drawHud() {
 	player := gs.Player
 	breakingManager := gs.BreakingManager
 
-	if inventoryDisplayed {
+	if player.InventoryOpen {
 		// fmt.Println("Displaying inventory")
-		DrawInventory(*&player.Inventory)
+		// calculate the origin
+		if player.ChestOpen != nil {
+			DrawChestInventory(player.ChestOpen)
+		} else{
+			inf := CalculatePlayerInventoryDimensionInformation(constants.PlayerInventoryRows,
+				constants.PlayerInventoryCols)
+			origX := (int32(GetScreenWidth()) / 2) - (constants.PlayerInventoryWidth / 2)
+			origY := (int32(GetScreenHeight()) / 2) - (int32(inf.InventoryHeight) / 2)
+			DrawInventory(*&player.Inventory, Vector2{X: float32(origX), Y: float32(origY)}, false, true, inf)
+		}
 	}
+
+	// check if inv open
+	if !player.InventoryOpen {
+		hotbarDisplayed = true
+	} else {
+		hotbarDisplayed = false
+	}
+
+
 	if hotbarDisplayed {
 		DrawHotbar(*player.Inventory, player.ActiveItemSlot)
 		// draw item name
@@ -200,6 +218,29 @@ func main() {
 		drawHud()
 		EndDrawing()
 	}
+}
+
+
+func openInventory(p *types.Player)  {
+	EnableCursor()
+	p.CanMoveCamera = false
+	p.InventoryOpen = true
+	hotbarDisplayed = false
+}
+
+func closeInventory(p *types.Player)  {
+	DisableCursor()
+	p.CanMoveCamera = true
+	p.InventoryOpen = false
+	hotbarDisplayed = true
+}
+
+func closeCurrentChest(p *types.Player) {
+	p.ChestOpen = nil
+	DisableCursor()
+	p.CanMoveCamera = true
+	p.InventoryOpen = false
+	hotbarDisplayed = true
 }
 
 func AddItemsToPlayerInv() {
