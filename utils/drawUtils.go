@@ -372,7 +372,7 @@ func CalculatePlayerInventoryDimensionInformation(rows, cols int) InventoryDimen
 	slotSize := (constants.PlayerInventoryWidth - (marginSpaceX)) / constants.PlayerInventoryCols
 
 	// calculate what the height should be
-	PlayerInventoryHeight := int(marginSpaceY) + (slotSize * constants.PlayerInventoryRows)
+	PlayerInventoryHeight := int(marginSpaceY) + (slotSize * rows)
 
 	return InventoryDimensionInformation{
 		DividerHeight: dividerHeight,
