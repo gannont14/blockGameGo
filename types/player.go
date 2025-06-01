@@ -129,9 +129,10 @@ func (p *Player) GenerateActiveBlock(activeChunks []*Chunk,
       (*potentialBlock).BlockPosition = *potentialBlockPosition
     }
 
-    // handle the breaking
-    p.handleBreaking(*focusedBlock,
-      bm)
+		if !p.InventoryOpen {
+			// handle the breaking
+			p.handleBreaking(*focusedBlock, bm)
+		}
 
 		// place the block
 		if IsKeyPressed(KeyF) || IsMouseButtonPressed(MouseButtonRight) {
