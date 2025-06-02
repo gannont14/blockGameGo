@@ -16,14 +16,6 @@ var (
 	gs *gamestate.GameState
 )
 
-// this is an absolute mess, don't ask
-type InventoryDimensionInformation struct {
-	DividerHeight   float64
-	MarginSpaceY    float64
-	MarginSpaceX    int
-	SlotSize        int
-	InventoryHeight int
-}
 
 func DrawChestInventory(chestInv *types.Inventory) {
 	// player ivn information
@@ -46,7 +38,8 @@ func DrawChestInventory(chestInv *types.Inventory) {
 		X: float32(w_h - tw_h),
 		Y: float32(h_h - th_h),
 	}
-	DrawInventory(chestInv, chestUIPos, false, false, chestI)
+
+	chestSlot := DrawInventory(chestInv, chestUIPos, false, false, chestI)
 
 	playerUIPos := Vector2{
 		X: float32(w_h - tw_h),
@@ -54,7 +47,14 @@ func DrawChestInventory(chestInv *types.Inventory) {
 	}
 
 	// draw the player inventory below
-	DrawInventory(gs.Player.Inventory, playerUIPos, false, true, playerI)
+	playerSlot := DrawInventory(gs.Player.Inventory, playerUIPos, false, true, playerI)
+
+	if chestSlot != -1 || playerSlot != -1 {
+		// this is the actual active slot
+		fmt.Println("AS: ", chestSlot, ":", playerSlot)
+	}
+
+
 }
 
 func drawItemDurability(item types.Item, pos Vector2, width, height int) {
@@ -361,29 +361,16 @@ func DrawItemSlot(is types.ItemStack, pos Vector2, slotSize int, col Color, hasB
 	}
 }
 
-func CalculatePlayerInventoryDimensionInformation(rows, cols int) InventoryDimensionInformation{
-	// divider between inventory and hotbar items
-	dividerHeight := constants.PlayerInventorySlotMargin * 3.0
-	// total margin space on y axis (numRows + 1)
-	marginSpaceY := float64(rows * constants.PlayerInventorySlotMargin) + dividerHeight
-	marginSpaceX := cols * constants.PlayerInventorySlotMargin
 
-	// slot size
-	slotSize := (constants.PlayerInventoryWidth - (marginSpaceX)) / constants.PlayerInventoryCols
+/*
+	Draws an inventory
+	Returns the active highlighted slot
 
-	// calculate what the height should be
-	PlayerInventoryHeight := int(marginSpaceY) + (slotSize * rows)
+	this is an outlandish set of parameters
+*/
 
-	return InventoryDimensionInformation{
-		DividerHeight: dividerHeight,
-		MarginSpaceY: marginSpaceY,
-		MarginSpaceX: marginSpaceX,
-		SlotSize: slotSize,
-		InventoryHeight: PlayerInventoryHeight,
-	}
-}
-
-func DrawInventory(inv *types.Inventory, pos Vector2, displayName bool, hasDivider bool ,inf InventoryDimensionInformation) {
+func DrawInventory(inv *types.Inventory, pos Vector2, displayName bool,
+	hasDivider bool ,inf InventoryDimensionInformation) int {
 
 	origX, origY := int32(pos.X), int32(pos.Y)
 
@@ -396,15 +383,18 @@ func DrawInventory(inv *types.Inventory, pos Vector2, displayName bool, hasDivid
 		int32(inf.InventoryHeight)+(2*constants.PlayerInventorySlotMargin),
 		White)
 
+	active := -1
 	// Draw the individual slots
 	if hasDivider {
-		DrawInventorySlots(inv, int(origX), int(origY), inf.SlotSize, int(inf.DividerHeight))
+		active = DrawInventorySlots(inv, int(origX), int(origY), inf.SlotSize, int(inf.DividerHeight))
 	}else {
-		DrawInventorySlots(inv, int(origX), int(origY), inf.SlotSize, 0)
+		active = DrawInventorySlots(inv, int(origX), int(origY), inf.SlotSize, 0)
 	}
+
+	return active
 }
 
-func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int) {
+func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int, dividerHeight int) int {
 	items := inv.Slots
 
 	// figure out which slot the user is hovering over
@@ -422,22 +412,22 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
 		col := Gray
 		origVec := NewVector2(float32(origX+xOffset), float32(origY+yOffset))
 		// check if mouse in that square
-		if pointInRectangle(GetMousePosition(), origVec, slotSize, slotSize) {
+		if PointInRectangle(GetMousePosition(), origVec, slotSize, slotSize) {
 			activeSlot = i
 			col = LightGray
 		}
 
+		// on click handler
 		DrawItemSlot(items[i], origVec, slotSize, col, false)
 		drawItemStack(origVec, items[i], slotSize)
-		// on click handler
-	}
-
-	types.UpdateActiveSelectedSlot(activeSlot)
 	// after the draw call, make sure that there is an active slot
 	if IsMouseButtonPressed(MouseLeftButton) {
 		// update the inventory accordignly
 		inv.HandleItemClick(activeSlot)
 	}
+	}
+
+	types.UpdateActiveSelectedSlot(activeSlot)
 	// PrintPlayerHand(inv)
 	drawItemStack(GetMousePosition(), inv.Hand, 50)
 
@@ -447,6 +437,8 @@ func DrawInventorySlots(inv *types.Inventory, origX int, origY int, slotSize int
 			GetMousePosition(),
 			activeSlot, 30)
 	}
+
+	return activeSlot
 }
 
 func drawHoveringItemName(inv types.Inventory, mousePos Vector2, activeSlot, fontSize int) {
@@ -533,7 +525,7 @@ func slotIndexToCoord(ind int) (int, int) {
 	return row, col
 }
 
-func pointInRectangle(point Vector2, orig Vector2, height int, width int) bool {
+func PointInRectangle(point Vector2, orig Vector2, height int, width int) bool {
 	// check x
 	px := int(point.X) // annoying to type cast every time
 	ox := int(orig.X)  // annoying to type cast every time
